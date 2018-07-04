@@ -33,7 +33,14 @@ public class BetfairStreamingQueueOUTListener {
             PlaceExecutionReportSource orderUpdate = mapper.readValue(str, PlaceExecutionReportSource.class);
             PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
             LOG.debug(placeExecutionReport.toString());
-            betByMarketService.newBet(placeExecutionReport);
+            BetByMarket betByMarketCheckExist = betByMarketService.checkExist(placeExecutionReport.getMarketId());
+            if (betByMarketCheckExist != null) {
+                LOG.debug("not null");
+                betByMarketService.updateBet(placeExecutionReport, betByMarketCheckExist.getKey());
+            } else {
+                betByMarketService.newBet(placeExecutionReport);
+            }
+
         } catch (Exception e) {
             LOG.error("BetfairStreamingQueueOUTListener rabbitListener", e);
         }

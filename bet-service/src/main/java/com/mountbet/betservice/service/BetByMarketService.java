@@ -1,5 +1,7 @@
 package com.mountbet.betservice.service;
 
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.utils.UUIDs;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceInstructionReport;
@@ -54,6 +56,39 @@ public class BetByMarketService {
             LOG.debug(betByMarket.toString());
             betByMarketRepository.insert(betByMarket);
         }
+    }
+
+    public void updateBet(PlaceExecutionReport placeExecutionReport, BetByMarketKey betByMarketKey) {
+        BetByMarket betByMarket = new BetByMarket();
+        String marketId = betByMarketKey.getMarketId();
+        UUID id = betByMarketKey.getId();
+        betByMarket.setKey(buildBetByMarketKey(marketId, id));
+        List<PlaceInstructionReport> placeInstructionReportList = placeExecutionReport.getInstructionReports();
+        for (PlaceInstructionReport placeInstructionReport : placeInstructionReportList) {
+            betByMarket.setSelectionId(placeInstructionReport.getInstruction().getSelectionId());
+            betByMarket.setHandicap(placeInstructionReport.getInstruction().getHandicap());
+            betByMarket.setSide(placeInstructionReport.getInstruction().getSide());
+
+            betByMarket.setSize(placeInstructionReport.getInstruction().getLimitOrder().getSize());
+            betByMarket.setPrice(placeInstructionReport.getInstruction().getLimitOrder().getPrice());
+            betByMarket.setPersistenceType(placeInstructionReport.getInstruction().getLimitOrder().getPersistenceType());
+
+            betByMarket.setBetId(Long.parseLong(placeInstructionReport.getBetId()));
+            betByMarket.setPlacedDate(placeInstructionReport.getPlacedDate());
+            betByMarket.setAvgPriceMatched(new BigDecimal(placeInstructionReport.getAveragePriceMatched(), MathContext.DECIMAL64));
+            betByMarket.setSizeMatched(new BigDecimal(placeInstructionReport.getSizeMatched(), MathContext.DECIMAL64));
+
+            LOG.debug(betByMarket.toString());
+            betByMarketRepository.save(betByMarket);
+        }
+
+    }
+
+    public BetByMarket checkExist(String marketId) {
+        Select.Where sw = QueryBuilder.select().from("bet_by_market")
+                .where(QueryBuilder.eq("market_id", marketId));
+        BetByMarket betByMarketCheckExist = cassandraTemplate.selectOne(sw, BetByMarket.class);
+        return betByMarketCheckExist;
     }
 
     private BetByMarketKey buildBetByMarketKey(String marketId) {
