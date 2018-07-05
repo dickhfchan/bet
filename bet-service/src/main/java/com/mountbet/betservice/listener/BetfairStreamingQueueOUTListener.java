@@ -40,7 +40,7 @@ public class BetfairStreamingQueueOUTListener {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    @RabbitListener(queues = "BetfairStreamingQueueOUT")
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key}'}")
     public void rabbitListener(Message msg) {
         try {
             String str = new String(msg.getBody(), StandardCharsets.UTF_8);
