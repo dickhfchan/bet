@@ -1,4 +1,4 @@
-package com.mountbet.betservice.entity.key.BetByMarket;
+package com.mountbet.betservice.entity.key.BetByBetId;
 
 import com.datastax.driver.core.DataType;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
@@ -10,22 +10,21 @@ import java.util.UUID;
 
 /**
  * @author AnsonChan
- * @since 28/6/2018
+ * @since 4/7/2018
  */
 @PrimaryKeyClass
-public class BetByMarketKey {
+public class BetByBetIdKey {
     @PrimaryKeyColumn(name = "market_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
     @CassandraType(type = DataType.Name.TEXT)
     private String marketId;
-
-    @PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-    @CassandraType(type = DataType.Name.TIMEUUID)
-    private UUID id;
 
     @PrimaryKeyColumn(name = "bet_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.BIGINT)
     private Long betId;
 
+    @PrimaryKeyColumn(name = "id", ordinal = 2, type = PrimaryKeyType.CLUSTERED)
+    @CassandraType(type = DataType.Name.TIMEUUID)
+    private UUID id;
 
     public String getMarketId() {
         return marketId;
@@ -43,10 +42,19 @@ public class BetByMarketKey {
         this.id = id;
     }
 
+    public Long getBetId() {
+        return betId;
+    }
+
+    public void setBetId(Long betId) {
+        this.betId = betId;
+    }
+
     @Override
     public String toString() {
-        return "BetByMarketKey{" +
+        return "BetByBetIdKey{" +
                 "marketId='" + marketId + '\'' +
+                ", betId=" + betId +
                 ", id=" + id +
                 '}';
     }

@@ -15,4 +15,8 @@ public enum Type {
     public String getDescription() {
         return this.description;
     }
+
+    public static Type fromString(String code) throws IllegalArgumentException {
+        return Type.valueOf(code);
+    }
 }
