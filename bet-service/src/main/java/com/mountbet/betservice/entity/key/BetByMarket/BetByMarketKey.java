@@ -19,7 +19,7 @@ public class BetByMarketKey {
     private String marketId;
 
     @PrimaryKeyColumn(name = "id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-    @CassandraType(type = DataType.Name.TIMEUUID)
+    @CassandraType(type = DataType.Name.UUID)
     private UUID id;
 
     @PrimaryKeyColumn(name = "bet_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)

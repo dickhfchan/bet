@@ -4,13 +4,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReport;
 import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReportSource;
-import com.mountbet.betservice.dto.CancelOrder.CancelInstructionReport;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReportSource;
-import com.mountbet.betservice.dto.PlaceOrder.PlaceInstructionReport;
 import com.mountbet.betservice.dto.QueryRequest;
 import com.mountbet.betservice.dto.QueryRequestSource;
-import com.mountbet.betservice.entity.BetByMarket;
 import com.mountbet.betservice.service.BetByMarketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,34 +40,24 @@ public class BetfairStreamingQueueOUTListener {
     @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key}'}")
     public void rabbitListener(Message msg) {
         try {
-            String str = new String(msg.getBody(), StandardCharsets.UTF_8);
-            QueryRequestSource queryRequestSource = mapper.readValue(str, QueryRequestSource.class);
+            String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
+            LOG.debug("messageString:" + messageString);
+            QueryRequestSource queryRequestSource = mapper.readValue(messageString, QueryRequestSource.class);
             QueryRequest queryRequest = queryRequestSource.getSource();
-            LOG.info("queryRequest:" + queryRequest.toString());
+            LOG.debug("queryRequest:" + queryRequest.toString());
             switch (queryRequest.getCustomerRef()) {
                 case PLACE_ORDERS:
                     LOG.debug("PLACE_ORDERS");
-                    PlaceExecutionReportSource orderUpdate = mapper.readValue(str, PlaceExecutionReportSource.class);
+                    PlaceExecutionReportSource orderUpdate = mapper.readValue(messageString, PlaceExecutionReportSource.class);
                     PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
-                    LOG.debug(placeExecutionReport.toString());
-                    String marketID = placeExecutionReport.getMarketId();
-                    for (PlaceInstructionReport placeInstructionReport : placeExecutionReport.getInstructionReports()) {
-                        BetByMarket betByMarketCheckExist = betByMarketService.checkExist(marketID, placeInstructionReport.getBetId());
-                        if (betByMarketCheckExist != null) {
-                            LOG.debug("not null");
-                            betByMarketService.updateBet(placeExecutionReport, betByMarketCheckExist.getKey());
-                        } else {
-                            betByMarketService.newBet(placeExecutionReport);
-                        }
-                    }
+                    LOG.debug("placeExecutionReport:" + placeExecutionReport.toString());
+                    betByMarketService.newBet(placeExecutionReport);
                     break;
                 case CANCEL_ORDERS:
                     LOG.debug("CANCEL_ORDERS");
-                    CancelExecutionReportSource cancelExecutionReportSource = mapper.readValue(str, CancelExecutionReportSource.class);
+                    CancelExecutionReportSource cancelExecutionReportSource = mapper.readValue(messageString, CancelExecutionReportSource.class);
                     CancelExecutionReport cancelExecutionReport = cancelExecutionReportSource.getSource();
-                    for (CancelInstructionReport cancelInstructionReport : cancelExecutionReport.getInstructionReports()) {
-                        betByMarketService.cancelBet(cancelExecutionReport.getMarketId(), cancelInstructionReport);
-                    }
+                    betByMarketService.cancelBet(cancelExecutionReport);
                     break;
             }
         } catch (Exception e) {
