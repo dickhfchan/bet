@@ -56,7 +56,7 @@ public class BetByMarketService {
                 betByMarket.setAvgPriceMatched(new BigDecimal(placeInstructionReport.getAveragePriceMatched(), MathContext.DECIMAL64));
                 betByMarket.setSizeMatched(new BigDecimal(placeInstructionReport.getSizeMatched(), MathContext.DECIMAL64));
 
-                LOG.debug(betByMarket.toString());
+                LOG.debug("betByMarket: " + betByMarket.toString());
                 betByMarketRepository.insert(betByMarket);
             } else {
                 LOG.error("Status failed: " + placeInstructionReport.getErrorCode());
@@ -69,16 +69,15 @@ public class BetByMarketService {
         List<CancelInstructionReport> cancelInstructionReportList = cancelExecutionReport.getInstructionReports();
         for (CancelInstructionReport cancelInstructionReport : cancelInstructionReportList) {
             if (cancelInstructionReport.getStatus().equals("SUCCESS")) {
-                BigDecimal newSize;
                 CancelInstruction cancelInstruction = cancelInstructionReport.getInstruction();
                 Long oldBetId = cancelInstruction.getBetId();
                 BetByBetId betByBetId = betByBetIdRepository.findByKeyMarketIdAndBetId(marketId, oldBetId);
-                newSize = betByBetId.getSize().subtract(new BigDecimal(cancelInstructionReport.getSizeCancelled()));
-                LOG.debug(newSize.toString());
+                BigDecimal newSize = betByBetId.getSize().subtract(new BigDecimal(cancelInstructionReport.getSizeCancelled()));
+                LOG.debug("newSize: " + newSize.toString());
                 UUID id = betByBetId.getKey().getId();
                 BetByMarket betByMarket = betByMarketRepository.findByKeyMarketIdAndKeyId(marketId, id);
-                LOG.debug(betByMarket.toString());
                 betByMarket.setSize(newSize);
+                LOG.debug("betByMarket: " + betByMarket.toString());
                 betByMarketRepository.save(betByMarket);
             } else {
                 LOG.error("Status failed: " + cancelInstructionReport.getErrorCode());
