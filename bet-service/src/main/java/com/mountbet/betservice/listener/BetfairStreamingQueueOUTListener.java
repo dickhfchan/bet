@@ -8,6 +8,10 @@ import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReportSource;
 import com.mountbet.betservice.dto.QueryRequest;
 import com.mountbet.betservice.dto.QueryRequestSource;
+import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReport;
+import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReportSource;
+import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
+import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReportSource;
 import com.mountbet.betservice.service.BetByMarketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +53,6 @@ public class BetfairStreamingQueueOUTListener {
                     LOG.debug("PLACE_ORDERS");
                     PlaceExecutionReportSource orderUpdate = mapper.readValue(messageString, PlaceExecutionReportSource.class);
                     PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
-                    LOG.debug("placeExecutionReport:" + placeExecutionReport.toString());
                     betByMarketService.placeBet(placeExecutionReport);
                     break;
                 case CANCEL_ORDERS:
@@ -57,6 +60,18 @@ public class BetfairStreamingQueueOUTListener {
                     CancelExecutionReportSource cancelExecutionReportSource = mapper.readValue(messageString, CancelExecutionReportSource.class);
                     CancelExecutionReport cancelExecutionReport = cancelExecutionReportSource.getSource();
                     betByMarketService.cancelBet(cancelExecutionReport);
+                    break;
+                case REPLACE_ORDERS:
+                    LOG.debug("REPLACE_ORDERS");
+                    ReplaceExecutionReportSource replaceExecutionReportSource = mapper.readValue(messageString, ReplaceExecutionReportSource.class);
+                    ReplaceExecutionReport replaceExecutionReport = replaceExecutionReportSource.getSource();
+                    betByMarketService.replaceBet(replaceExecutionReport);
+                    break;
+                case UPDATE_ORDERS:
+                    LOG.debug("UPDATE_ORDERS");
+                    UpdateExecutionReportSource updateExecutionReportSource = mapper.readValue(messageString, UpdateExecutionReportSource.class);
+                    UpdateExecutionReport updateExecutionReport = updateExecutionReportSource.getSource();
+                    betByMarketService.updateBet(updateExecutionReport);
                     break;
                 default:
                     LOG.error("Unsupport case: " + queryRequest.toString());

@@ -5,6 +5,10 @@ import com.mountbet.betservice.dto.CancelOrder.CancelInstruction;
 import com.mountbet.betservice.dto.CancelOrder.CancelInstructionReport;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceInstructionReport;
+import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReport;
+import com.mountbet.betservice.dto.ReplaceOrder.ReplaceInstructionReport;
+import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
+import com.mountbet.betservice.dto.UpdateOrder.UpdateInstructionReport;
 import com.mountbet.betservice.entity.BetByBetId;
 import com.mountbet.betservice.entity.BetByMarket;
 import com.mountbet.betservice.entity.key.BetByMarket.BetByMarketKey;
@@ -37,30 +41,34 @@ public class BetByMarketService {
     private BetByBetIdRepository betByBetIdRepository;
 
     public void placeBet(PlaceExecutionReport placeExecutionReport) {
+        String marketId = placeExecutionReport.getMarketId();
         List<PlaceInstructionReport> placeInstructionReportList = placeExecutionReport.getInstructionReports();
         for (PlaceInstructionReport placeInstructionReport : placeInstructionReportList) {
-            if (placeInstructionReport.getStatus().equals("SUCCESS")) {
-                BetByMarket betByMarket = new BetByMarket();
+            doPlaceBet(placeInstructionReport, marketId);
+        }
+    }
 
-                betByMarket.setKey(buildBetByMarketKey(placeExecutionReport.getMarketId()));
-                betByMarket.setSelectionId(placeInstructionReport.getInstruction().getSelectionId());
-                betByMarket.setHandicap(placeInstructionReport.getInstruction().getHandicap());
-                betByMarket.setSide(placeInstructionReport.getInstruction().getSide());
+    public void doPlaceBet(PlaceInstructionReport placeInstructionReport, String marketId) {
+        if (placeInstructionReport.getStatus().equals("SUCCESS")) {
+            BetByMarket betByMarket = new BetByMarket();
 
-                betByMarket.setSize(placeInstructionReport.getInstruction().getLimitOrder().getSize());
-                betByMarket.setPrice(placeInstructionReport.getInstruction().getLimitOrder().getPrice());
-                betByMarket.setPersistenceType(placeInstructionReport.getInstruction().getLimitOrder().getPersistenceType());
+            betByMarket.setKey(buildBetByMarketKey(marketId));
+            betByMarket.setSelectionId(placeInstructionReport.getInstruction().getSelectionId());
+            betByMarket.setHandicap(placeInstructionReport.getInstruction().getHandicap());
+            betByMarket.setSide(placeInstructionReport.getInstruction().getSide());
 
-                betByMarket.setBetId(Long.parseLong(placeInstructionReport.getBetId()));
-                betByMarket.setPlacedDate(placeInstructionReport.getPlacedDate());
-                betByMarket.setAvgPriceMatched(new BigDecimal(placeInstructionReport.getAveragePriceMatched(), MathContext.DECIMAL64));
-                betByMarket.setSizeMatched(new BigDecimal(placeInstructionReport.getSizeMatched(), MathContext.DECIMAL64));
+            betByMarket.setSize(placeInstructionReport.getInstruction().getLimitOrder().getSize());
+            betByMarket.setPrice(placeInstructionReport.getInstruction().getLimitOrder().getPrice());
+            betByMarket.setPersistenceType(placeInstructionReport.getInstruction().getLimitOrder().getPersistenceType());
 
-                LOG.debug("betByMarket: " + betByMarket.toString());
-                betByMarketRepository.insert(betByMarket);
-            } else {
-                LOG.error("Status failed: " + placeInstructionReport.getErrorCode());
-            }
+            betByMarket.setBetId(Long.parseLong(placeInstructionReport.getBetId()));
+            betByMarket.setPlacedDate(placeInstructionReport.getPlacedDate());
+            betByMarket.setAvgPriceMatched(new BigDecimal(placeInstructionReport.getAveragePriceMatched(), MathContext.DECIMAL64));
+            betByMarket.setSizeMatched(new BigDecimal(placeInstructionReport.getSizeMatched(), MathContext.DECIMAL64));
+
+            betByMarketRepository.insert(betByMarket);
+        } else {
+            LOG.error("Status failed in doPlaceBet: " + placeInstructionReport.getErrorCode());
         }
     }
 
@@ -68,23 +76,52 @@ public class BetByMarketService {
         String marketId = cancelExecutionReport.getMarketId();
         List<CancelInstructionReport> cancelInstructionReportList = cancelExecutionReport.getInstructionReports();
         for (CancelInstructionReport cancelInstructionReport : cancelInstructionReportList) {
-            if (cancelInstructionReport.getStatus().equals("SUCCESS")) {
-                CancelInstruction cancelInstruction = cancelInstructionReport.getInstruction();
-                Long oldBetId = cancelInstruction.getBetId();
-                BetByBetId betByBetId = betByBetIdRepository.findByKeyMarketIdAndBetId(marketId, oldBetId);
-                BigDecimal newSize = betByBetId.getSize().subtract(new BigDecimal(cancelInstructionReport.getSizeCancelled()));
-                LOG.debug("newSize: " + newSize.toString());
-                UUID id = betByBetId.getKey().getId();
-                BetByMarket betByMarket = betByMarketRepository.findByKeyMarketIdAndKeyId(marketId, id);
-                betByMarket.setSize(newSize);
-                LOG.debug("betByMarket: " + betByMarket.toString());
-                betByMarketRepository.save(betByMarket);
-            } else {
-                LOG.error("Status failed: " + cancelInstructionReport.getErrorCode());
-            }
+            doCancelBet(cancelInstructionReport, marketId);
         }
     }
 
+    public void doCancelBet(CancelInstructionReport cancelInstructionReport, String marketId) {
+        if (cancelInstructionReport.getStatus().equals("SUCCESS")) {
+            CancelInstruction cancelInstruction = cancelInstructionReport.getInstruction();
+            Long oldBetId = cancelInstruction.getBetId();
+            BetByBetId betByBetId = betByBetIdRepository.findByKeyMarketIdAndBetId(marketId, oldBetId);
+            BigDecimal newSize = betByBetId.getSize().subtract(new BigDecimal(cancelInstructionReport.getSizeCancelled()));
+            UUID id = betByBetId.getKey().getId();
+            BetByMarket betByMarket = betByMarketRepository.findByKeyMarketIdAndKeyId(marketId, id);
+            betByMarket.setSize(newSize);
+            betByMarketRepository.save(betByMarket);
+        } else {
+            LOG.error("Status failed in doCancelBet: " + cancelInstructionReport.getErrorCode());
+        }
+    }
+
+    public void replaceBet(ReplaceExecutionReport replaceExecutionReport) {
+        String marketId = replaceExecutionReport.getMarketId();
+        List<ReplaceInstructionReport> replaceInstructionReportList = replaceExecutionReport.getInstructionReports();
+        for (ReplaceInstructionReport replaceInstructionReport : replaceInstructionReportList) {
+            CancelInstructionReport cancelInstructionReport = replaceInstructionReport.getCancelInstructionReport();
+            PlaceInstructionReport placeInstructionReport = replaceInstructionReport.getPlaceInstructionReport();
+            doCancelBet(cancelInstructionReport, marketId);
+            doPlaceBet(placeInstructionReport, marketId);
+        }
+    }
+
+    public void updateBet(UpdateExecutionReport updateExecutionReport){
+        String marketId = updateExecutionReport.getMarketId();
+        List<UpdateInstructionReport> updateInstructionReportList = updateExecutionReport.getInstructionReports();
+        for(UpdateInstructionReport updateInstructionReport: updateInstructionReportList){
+            if(updateExecutionReport.getStatus().equals("SUCCESS")){
+                Long betId = updateInstructionReport.getInstruction().getBetId();
+                BetByBetId betByBetId = betByBetIdRepository.findByKeyMarketIdAndBetId(marketId, betId);
+                UUID id = betByBetId.getKey().getId();
+                BetByMarket betByMarket = betByMarketRepository.findByKeyMarketIdAndKeyId(marketId,id);
+                betByMarket.setPersistenceType(updateInstructionReport.getInstruction().getNewPersistenceType());
+                betByMarketRepository.save(betByMarket);
+            }else{
+                LOG.error("Status failed in updateBet: " + updateInstructionReport.getErrorCode());
+            }
+        }
+    }
 
     private BetByMarketKey buildBetByMarketKey(String marketId) {
         BetByMarketKey key = new BetByMarketKey();
@@ -92,5 +129,4 @@ public class BetByMarketService {
         key.setId(UUID.randomUUID());
         return key;
     }
-
 }
