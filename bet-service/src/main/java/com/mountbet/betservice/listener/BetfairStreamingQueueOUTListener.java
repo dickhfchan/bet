@@ -44,7 +44,6 @@ public class BetfairStreamingQueueOUTListener {
             LOG.debug("messageString:" + messageString);
             QueryRequestSource queryRequestSource = mapper.readValue(messageString, QueryRequestSource.class);
             QueryRequest queryRequest = queryRequestSource.getSource();
-            LOG.debug("queryRequest:" + queryRequest.toString());
             switch (queryRequest.getCustomerRef()) {
                 case PLACE_ORDERS:
                     LOG.debug("PLACE_ORDERS");
@@ -59,6 +58,8 @@ public class BetfairStreamingQueueOUTListener {
                     CancelExecutionReport cancelExecutionReport = cancelExecutionReportSource.getSource();
                     betByMarketService.cancelBet(cancelExecutionReport);
                     break;
+                default:
+                    LOG.error("Unsupport case: " + queryRequest.toString());
             }
         } catch (Exception e) {
             LOG.error("BetfairStreamingQueueOUTListener rabbitListener", e);
