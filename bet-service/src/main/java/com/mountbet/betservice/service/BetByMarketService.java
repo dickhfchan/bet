@@ -36,7 +36,7 @@ public class BetByMarketService {
     @Autowired
     private BetByBetIdRepository betByBetIdRepository;
 
-    public void newBet(PlaceExecutionReport placeExecutionReport) {
+    public void placeBet(PlaceExecutionReport placeExecutionReport) {
         List<PlaceInstructionReport> placeInstructionReportList = placeExecutionReport.getInstructionReports();
         for (PlaceInstructionReport placeInstructionReport : placeInstructionReportList) {
             if (placeInstructionReport.getStatus().equals("SUCCESS")) {

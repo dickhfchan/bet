@@ -51,7 +51,7 @@ public class BetfairStreamingQueueOUTListener {
                     PlaceExecutionReportSource orderUpdate = mapper.readValue(messageString, PlaceExecutionReportSource.class);
                     PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
                     LOG.debug("placeExecutionReport:" + placeExecutionReport.toString());
-                    betByMarketService.newBet(placeExecutionReport);
+                    betByMarketService.placeBet(placeExecutionReport);
                     break;
                 case CANCEL_ORDERS:
                     LOG.debug("CANCEL_ORDERS");
