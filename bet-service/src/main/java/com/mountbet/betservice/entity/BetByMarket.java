@@ -79,9 +79,9 @@ public class BetByMarket {
     @CassandraType(type = DataType.Name.DECIMAL)
     private BigDecimal profit;
 
-    @Column(value = "risk_ceofficient")
+    @Column(value = "risk_coefficient")
     @CassandraType(type = DataType.Name.MAP, typeArguments = {DataType.Name.BIGINT, DataType.Name.DECIMAL})
-    private Map<Long, BigDecimal> riskCeofficient;
+    private Map<Long, BigDecimal> riskCoefficient;
 
     @Column(value = "risk_detail")
     @CassandraType(type = DataType.Name.UDT, userTypeName = "place_order_risk_detail")
@@ -259,12 +259,12 @@ public class BetByMarket {
         this.profit = profit;
     }
 
-    public Map<Long, BigDecimal> getRiskCeofficient() {
-        return riskCeofficient;
+    public Map<Long, BigDecimal> getRiskCoefficient() {
+        return riskCoefficient;
     }
 
-    public void setRiskCeofficient(Map<Long, BigDecimal> riskCeofficient) {
-        this.riskCeofficient = riskCeofficient;
+    public void setRiskCoefficient(Map<Long, BigDecimal> riskCoefficient) {
+        this.riskCoefficient = riskCoefficient;
     }
 
     public BetByMarketPlaceOrderRiskDetail getRiskDetail() {
@@ -397,7 +397,7 @@ public class BetByMarket {
                 ", placedIp='" + placedIp + '\'' +
                 ", price=" + price +
                 ", profit=" + profit +
-                ", riskCeofficient=" + riskCeofficient +
+                ", riskCoefficient=" + riskCoefficient +
                 ", riskDetail=" + riskDetail +
                 ", selectionId=" + selectionId +
                 ", settledDate=" + settledDate +
