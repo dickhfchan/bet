@@ -3,13 +3,9 @@ package com.mountbet.betservice.listener;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReport;
-import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReportSource;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
-import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReportSource;
 import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReport;
-import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReportSource;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
-import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReportSource;
 import com.mountbet.betservice.service.BetByMarketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +41,7 @@ public class BetfairStreamingQueueOUTListener {
             String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
             LOG.debug("messageString:" + messageString);
             LOG.debug("PLACE_ORDERS");
-            PlaceExecutionReportSource orderUpdate = mapper.readValue(messageString, PlaceExecutionReportSource.class);
-            PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
+            PlaceExecutionReport placeExecutionReport = mapper.readValue(messageString, PlaceExecutionReport.class);
             betByMarketService.placeBet(placeExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerPlaceOrders rabbitListener", e);
@@ -59,8 +54,7 @@ public class BetfairStreamingQueueOUTListener {
             String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
             LOG.debug("messageString:" + messageString);
             LOG.debug("CANCEL_ORDERS");
-            CancelExecutionReportSource cancelExecutionReportSource = mapper.readValue(messageString, CancelExecutionReportSource.class);
-            CancelExecutionReport cancelExecutionReport = cancelExecutionReportSource.getSource();
+            CancelExecutionReport cancelExecutionReport = mapper.readValue(messageString, CancelExecutionReport.class);
             betByMarketService.cancelBet(cancelExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerCancelOrders rabbitListener", e);
@@ -73,8 +67,7 @@ public class BetfairStreamingQueueOUTListener {
             String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
             LOG.debug("messageString:" + messageString);
             LOG.debug("REPLACE_ORDERS");
-            ReplaceExecutionReportSource replaceExecutionReportSource = mapper.readValue(messageString, ReplaceExecutionReportSource.class);
-            ReplaceExecutionReport replaceExecutionReport = replaceExecutionReportSource.getSource();
+            ReplaceExecutionReport replaceExecutionReport = mapper.readValue(messageString, ReplaceExecutionReport.class);
             betByMarketService.replaceBet(replaceExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerReplaceOrders rabbitListener", e);
@@ -87,8 +80,7 @@ public class BetfairStreamingQueueOUTListener {
             String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
             LOG.debug("messageString:" + messageString);
             LOG.debug("UPDATE_ORDERS");
-            UpdateExecutionReportSource updateExecutionReportSource = mapper.readValue(messageString, UpdateExecutionReportSource.class);
-            UpdateExecutionReport updateExecutionReport = updateExecutionReportSource.getSource();
+            UpdateExecutionReport updateExecutionReport = mapper.readValue(messageString, UpdateExecutionReport.class);
             betByMarketService.updateBet(updateExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerUpdateOrders rabbitListener", e);
