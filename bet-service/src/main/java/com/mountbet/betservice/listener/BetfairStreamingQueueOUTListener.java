@@ -7,10 +7,14 @@ import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
 import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReport;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
 import com.mountbet.betservice.service.BetByMarketService;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.ChannelCallback;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +34,9 @@ public class BetfairStreamingQueueOUTListener {
     @Autowired
     private BetByMarketService betByMarketService;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @PostConstruct
     public void init() {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -38,11 +45,14 @@ public class BetfairStreamingQueueOUTListener {
     @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-place-order}'}")
     public void rabbitListenerPlaceOrders(Message msg) {
         try {
+            LOG.debug("getMessageProperties:" + msg.getMessageProperties().getCorrelationId());
+            LOG.debug("getReplyTo:" + msg.getMessageProperties().getReplyTo());
             String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
             LOG.debug("messageString:" + messageString);
             LOG.debug("PLACE_ORDERS");
             PlaceExecutionReport placeExecutionReport = mapper.readValue(messageString, PlaceExecutionReport.class);
             betByMarketService.placeBet(placeExecutionReport);
+            reply(msg, placeExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerPlaceOrders rabbitListener", e);
         }
@@ -56,6 +66,7 @@ public class BetfairStreamingQueueOUTListener {
             LOG.debug("CANCEL_ORDERS");
             CancelExecutionReport cancelExecutionReport = mapper.readValue(messageString, CancelExecutionReport.class);
             betByMarketService.cancelBet(cancelExecutionReport);
+            reply(msg, cancelExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerCancelOrders rabbitListener", e);
         }
@@ -69,6 +80,7 @@ public class BetfairStreamingQueueOUTListener {
             LOG.debug("REPLACE_ORDERS");
             ReplaceExecutionReport replaceExecutionReport = mapper.readValue(messageString, ReplaceExecutionReport.class);
             betByMarketService.replaceBet(replaceExecutionReport);
+            reply(msg, replaceExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerReplaceOrders rabbitListener", e);
         }
@@ -82,8 +94,23 @@ public class BetfairStreamingQueueOUTListener {
             LOG.debug("UPDATE_ORDERS");
             UpdateExecutionReport updateExecutionReport = mapper.readValue(messageString, UpdateExecutionReport.class);
             betByMarketService.updateBet(updateExecutionReport);
+            reply(msg, updateExecutionReport);
         } catch (Exception e) {
             LOG.error("rabbitListenerUpdateOrders rabbitListener", e);
         }
+    }
+
+    public void reply(Message msg, Object object) {
+        rabbitTemplate.execute(new ChannelCallback<Object>() {
+            @Override
+            public Object doInRabbit(Channel channel) throws Exception {
+                AMQP.BasicProperties replyProps = new AMQP.BasicProperties
+                        .Builder()
+                        .correlationId(msg.getMessageProperties().getCorrelationId())
+                        .build();
+                channel.basicPublish("", msg.getMessageProperties().getReplyTo(), replyProps, mapper.writeValueAsBytes(object));
+                return null;
+            }
+        });
     }
 }
