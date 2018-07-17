@@ -6,8 +6,6 @@ import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReport;
 import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReportSource;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReportSource;
-import com.mountbet.betservice.dto.QueryRequest;
-import com.mountbet.betservice.dto.QueryRequestSource;
 import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReport;
 import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReportSource;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
@@ -41,43 +39,59 @@ public class BetfairStreamingQueueOUTListener {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key}'}")
-    public void rabbitListener(Message msg) {
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-place-order}'}")
+    public void rabbitListenerPlaceOrders(Message msg) {
         try {
             String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
             LOG.debug("messageString:" + messageString);
-            QueryRequestSource queryRequestSource = mapper.readValue(messageString, QueryRequestSource.class);
-            QueryRequest queryRequest = queryRequestSource.getSource();
-            switch (queryRequest.getCustomerRef()) {
-                case PLACE_ORDERS:
-                    LOG.debug("PLACE_ORDERS");
-                    PlaceExecutionReportSource orderUpdate = mapper.readValue(messageString, PlaceExecutionReportSource.class);
-                    PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
-                    betByMarketService.placeBet(placeExecutionReport);
-                    break;
-                case CANCEL_ORDERS:
-                    LOG.debug("CANCEL_ORDERS");
-                    CancelExecutionReportSource cancelExecutionReportSource = mapper.readValue(messageString, CancelExecutionReportSource.class);
-                    CancelExecutionReport cancelExecutionReport = cancelExecutionReportSource.getSource();
-                    betByMarketService.cancelBet(cancelExecutionReport);
-                    break;
-                case REPLACE_ORDERS:
-                    LOG.debug("REPLACE_ORDERS");
-                    ReplaceExecutionReportSource replaceExecutionReportSource = mapper.readValue(messageString, ReplaceExecutionReportSource.class);
-                    ReplaceExecutionReport replaceExecutionReport = replaceExecutionReportSource.getSource();
-                    betByMarketService.replaceBet(replaceExecutionReport);
-                    break;
-                case UPDATE_ORDERS:
-                    LOG.debug("UPDATE_ORDERS");
-                    UpdateExecutionReportSource updateExecutionReportSource = mapper.readValue(messageString, UpdateExecutionReportSource.class);
-                    UpdateExecutionReport updateExecutionReport = updateExecutionReportSource.getSource();
-                    betByMarketService.updateBet(updateExecutionReport);
-                    break;
-                default:
-                    LOG.error("Unsupport case: " + queryRequest.toString());
-            }
+            LOG.debug("PLACE_ORDERS");
+            PlaceExecutionReportSource orderUpdate = mapper.readValue(messageString, PlaceExecutionReportSource.class);
+            PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
+            betByMarketService.placeBet(placeExecutionReport);
         } catch (Exception e) {
-            LOG.error("BetfairStreamingQueueOUTListener rabbitListener", e);
+            LOG.error("rabbitListenerPlaceOrders rabbitListener", e);
+        }
+    }
+
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-cancel-order}'}")
+    public void rabbitListenerCancelOrders(Message msg) {
+        try {
+            String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
+            LOG.debug("messageString:" + messageString);
+            LOG.debug("CANCEL_ORDERS");
+            CancelExecutionReportSource cancelExecutionReportSource = mapper.readValue(messageString, CancelExecutionReportSource.class);
+            CancelExecutionReport cancelExecutionReport = cancelExecutionReportSource.getSource();
+            betByMarketService.cancelBet(cancelExecutionReport);
+        } catch (Exception e) {
+            LOG.error("rabbitListenerCancelOrders rabbitListener", e);
+        }
+    }
+
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-replace-order}'}")
+    public void rabbitListenerReplaceOrders(Message msg) {
+        try {
+            String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
+            LOG.debug("messageString:" + messageString);
+            LOG.debug("REPLACE_ORDERS");
+            ReplaceExecutionReportSource replaceExecutionReportSource = mapper.readValue(messageString, ReplaceExecutionReportSource.class);
+            ReplaceExecutionReport replaceExecutionReport = replaceExecutionReportSource.getSource();
+            betByMarketService.replaceBet(replaceExecutionReport);
+        } catch (Exception e) {
+            LOG.error("rabbitListenerReplaceOrders rabbitListener", e);
+        }
+    }
+
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-update-order}'}")
+    public void rabbitListenerUpdateOrders(Message msg) {
+        try {
+            String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
+            LOG.debug("messageString:" + messageString);
+            LOG.debug("UPDATE_ORDERS");
+            UpdateExecutionReportSource updateExecutionReportSource = mapper.readValue(messageString, UpdateExecutionReportSource.class);
+            UpdateExecutionReport updateExecutionReport = updateExecutionReportSource.getSource();
+            betByMarketService.updateBet(updateExecutionReport);
+        } catch (Exception e) {
+            LOG.error("rabbitListenerUpdateOrders rabbitListener", e);
         }
     }
 }
