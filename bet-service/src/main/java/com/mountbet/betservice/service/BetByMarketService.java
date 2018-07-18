@@ -1,5 +1,6 @@
 package com.mountbet.betservice.service;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReport;
 import com.mountbet.betservice.dto.CancelOrder.CancelInstruction;
 import com.mountbet.betservice.dto.CancelOrder.CancelInstructionReport;
@@ -126,7 +127,7 @@ public class BetByMarketService {
     private BetByMarketKey buildBetByMarketKey(String marketId) {
         BetByMarketKey key = new BetByMarketKey();
         key.setMarketId(marketId);
-        key.setId(UUID.randomUUID());
+        key.setId(UUIDs.timeBased());
         return key;
     }
 }

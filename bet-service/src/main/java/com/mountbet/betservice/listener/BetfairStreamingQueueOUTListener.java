@@ -3,20 +3,18 @@ package com.mountbet.betservice.listener;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReport;
-import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReportSource;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
-import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReportSource;
-import com.mountbet.betservice.dto.QueryRequest;
-import com.mountbet.betservice.dto.QueryRequestSource;
 import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReport;
-import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReportSource;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
-import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReportSource;
 import com.mountbet.betservice.service.BetByMarketService;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.ChannelCallback;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,48 +34,83 @@ public class BetfairStreamingQueueOUTListener {
     @Autowired
     private BetByMarketService betByMarketService;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @PostConstruct
     public void init() {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key}'}")
-    public void rabbitListener(Message msg) {
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-place-order}'}")
+    public void rabbitListenerPlaceOrders(Message msg) {
+        try {
+            LOG.debug("getMessageProperties:" + msg.getMessageProperties().getCorrelationId());
+            LOG.debug("getReplyTo:" + msg.getMessageProperties().getReplyTo());
+            String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
+            LOG.debug("messageString:" + messageString);
+            LOG.debug("PLACE_ORDERS");
+            PlaceExecutionReport placeExecutionReport = mapper.readValue(messageString, PlaceExecutionReport.class);
+            betByMarketService.placeBet(placeExecutionReport);
+            reply(msg, placeExecutionReport);
+        } catch (Exception e) {
+            LOG.error("rabbitListenerPlaceOrders rabbitListener", e);
+        }
+    }
+
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-cancel-order}'}")
+    public void rabbitListenerCancelOrders(Message msg) {
         try {
             String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
             LOG.debug("messageString:" + messageString);
-            QueryRequestSource queryRequestSource = mapper.readValue(messageString, QueryRequestSource.class);
-            QueryRequest queryRequest = queryRequestSource.getSource();
-            switch (queryRequest.getCustomerRef()) {
-                case PLACE_ORDERS:
-                    LOG.debug("PLACE_ORDERS");
-                    PlaceExecutionReportSource orderUpdate = mapper.readValue(messageString, PlaceExecutionReportSource.class);
-                    PlaceExecutionReport placeExecutionReport = orderUpdate.getSource();
-                    betByMarketService.placeBet(placeExecutionReport);
-                    break;
-                case CANCEL_ORDERS:
-                    LOG.debug("CANCEL_ORDERS");
-                    CancelExecutionReportSource cancelExecutionReportSource = mapper.readValue(messageString, CancelExecutionReportSource.class);
-                    CancelExecutionReport cancelExecutionReport = cancelExecutionReportSource.getSource();
-                    betByMarketService.cancelBet(cancelExecutionReport);
-                    break;
-                case REPLACE_ORDERS:
-                    LOG.debug("REPLACE_ORDERS");
-                    ReplaceExecutionReportSource replaceExecutionReportSource = mapper.readValue(messageString, ReplaceExecutionReportSource.class);
-                    ReplaceExecutionReport replaceExecutionReport = replaceExecutionReportSource.getSource();
-                    betByMarketService.replaceBet(replaceExecutionReport);
-                    break;
-                case UPDATE_ORDERS:
-                    LOG.debug("UPDATE_ORDERS");
-                    UpdateExecutionReportSource updateExecutionReportSource = mapper.readValue(messageString, UpdateExecutionReportSource.class);
-                    UpdateExecutionReport updateExecutionReport = updateExecutionReportSource.getSource();
-                    betByMarketService.updateBet(updateExecutionReport);
-                    break;
-                default:
-                    LOG.error("Unsupport case: " + queryRequest.toString());
-            }
+            LOG.debug("CANCEL_ORDERS");
+            CancelExecutionReport cancelExecutionReport = mapper.readValue(messageString, CancelExecutionReport.class);
+            betByMarketService.cancelBet(cancelExecutionReport);
+            reply(msg, cancelExecutionReport);
         } catch (Exception e) {
-            LOG.error("BetfairStreamingQueueOUTListener rabbitListener", e);
+            LOG.error("rabbitListenerCancelOrders rabbitListener", e);
         }
+    }
+
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-replace-order}'}")
+    public void rabbitListenerReplaceOrders(Message msg) {
+        try {
+            String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
+            LOG.debug("messageString:" + messageString);
+            LOG.debug("REPLACE_ORDERS");
+            ReplaceExecutionReport replaceExecutionReport = mapper.readValue(messageString, ReplaceExecutionReport.class);
+            betByMarketService.replaceBet(replaceExecutionReport);
+            reply(msg, replaceExecutionReport);
+        } catch (Exception e) {
+            LOG.error("rabbitListenerReplaceOrders rabbitListener", e);
+        }
+    }
+
+    @RabbitListener(queues = "#{'${spring.rabbitmq.routing-key-update-order}'}")
+    public void rabbitListenerUpdateOrders(Message msg) {
+        try {
+            String messageString = new String(msg.getBody(), StandardCharsets.UTF_8);
+            LOG.debug("messageString:" + messageString);
+            LOG.debug("UPDATE_ORDERS");
+            UpdateExecutionReport updateExecutionReport = mapper.readValue(messageString, UpdateExecutionReport.class);
+            betByMarketService.updateBet(updateExecutionReport);
+            reply(msg, updateExecutionReport);
+        } catch (Exception e) {
+            LOG.error("rabbitListenerUpdateOrders rabbitListener", e);
+        }
+    }
+
+    public void reply(Message msg, Object object) {
+        rabbitTemplate.execute(new ChannelCallback<Object>() {
+            @Override
+            public Object doInRabbit(Channel channel) throws Exception {
+                AMQP.BasicProperties replyProps = new AMQP.BasicProperties
+                        .Builder()
+                        .correlationId(msg.getMessageProperties().getCorrelationId())
+                        .build();
+                channel.basicPublish("", msg.getMessageProperties().getReplyTo(), replyProps, mapper.writeValueAsBytes(object));
+                return null;
+            }
+        });
     }
 }
