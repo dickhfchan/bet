@@ -106,6 +106,8 @@ public class BetfairStreamingQueueOUTListener {
             public Object doInRabbit(Channel channel) throws Exception {
                 AMQP.BasicProperties replyProps = new AMQP.BasicProperties
                         .Builder()
+                        .contentType("application/json")
+                        .contentEncoding("utf-8")
                         .correlationId(msg.getMessageProperties().getCorrelationId())
                         .build();
                 channel.basicPublish("", msg.getMessageProperties().getReplyTo(), replyProps, mapper.writeValueAsBytes(object));
