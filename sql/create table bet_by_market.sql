@@ -31,5 +31,5 @@ CREATE TABLE bet_by_market (
    size_remaining decimal,
    size_voided decimal,
    version int,
-   PRIMARY KEY (market_id, id, bet_id)
+   PRIMARY KEY (market_id, bet_id, id)
 );
