@@ -18,7 +18,7 @@ import com.mountbet.betservice.dto.UpdateOrder.UpdateInstructionReport;
 import com.mountbet.betservice.entity.BetByMarket;
 import com.mountbet.betservice.entity.key.BetByMarketKey;
 import com.mountbet.betservice.repository.BetByMarketRepository;
-import com.mountbet.betservice.rest_template.NavigationRestTemplate;
+import com.mountbet.betservice.client.NavigationClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class BetByMarketService {
     private BetByMarketRepository betByMarketRepository;
 
     @Autowired
-    private NavigationRestTemplate navigationRestTemplate;
+    private NavigationClient navigationClient;
 
     public void placeBet(PlaceExecutionReport placeExecutionReport) {
         String marketId = placeExecutionReport.getMarketId();
@@ -52,7 +52,7 @@ public class BetByMarketService {
     public void doPlaceBet(PlaceInstructionReport placeInstructionReport, String marketId) {
         if (placeInstructionReport.getStatus().equals("SUCCESS")) {
             PlaceInstruction placeInstruction = placeInstructionReport.getInstruction();
-            NavigationDetail navigationDetail = navigationRestTemplate.getMarketDetails(marketId);
+            NavigationDetail navigationDetail = navigationClient.getMarketDetails(marketId);
             BetByMarket betByMarket = new BetByMarket();
             betByMarket.setKey(buildBetByMarketKey(marketId, navigationDetail.getEventTypeId(), navigationDetail.getEventId(), placeInstruction.getSelectionId(), placeInstructionReport.getBetId(), 100l, State.UNMATCHED, placeInstruction.getSide(), Status.CURRENT, placeInstructionReport.getPlacedDate()));
             betByMarket.setHandicap(placeInstructionReport.getInstruction().getHandicap());

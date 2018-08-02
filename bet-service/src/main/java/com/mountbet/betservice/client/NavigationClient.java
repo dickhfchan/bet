@@ -1,4 +1,4 @@
-package com.mountbet.betservice.rest_template;
+package com.mountbet.betservice.client;
 
 import com.mountbet.betservice.dto.NavigationDetail;
 import org.slf4j.Logger;
@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class NavigationRestTemplate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NavigationRestTemplate.class);
+public class NavigationClient {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NavigationClient.class);
 
     @Value("${navigation-service.url}")
     private String navigationServiceUrl;
