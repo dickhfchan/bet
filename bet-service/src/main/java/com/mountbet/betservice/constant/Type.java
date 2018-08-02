@@ -4,7 +4,8 @@ public enum Type {
     PLACE_ORDERS("Place an order"),
     REPLACE_ORDERS("Replace an order"),
     CANCEL_ORDERS("Cancel an order"),
-    UPDATE_ORDERS("Update an order");
+    UPDATE_ORDERS("Update an order"),
+    SUBSCRIBE_ORDERS("Order subscription");
 
     private String description;
 
