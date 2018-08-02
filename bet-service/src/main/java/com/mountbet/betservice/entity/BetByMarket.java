@@ -40,7 +40,7 @@ public class BetByMarket {
 
     @Column(value = "average_size_matched")
     @CassandraType(type = DataType.Name.DECIMAL)
-    private String averageSizeMatched;
+    private BigDecimal averageSizeMatched = new BigDecimal(0.0);
 
     @Column(value = "size")
     @CassandraType(type = DataType.Name.DECIMAL)
@@ -138,11 +138,11 @@ public class BetByMarket {
         this.placedIp = placedIp;
     }
 
-    public String getAverageSizeMatched() {
+    public BigDecimal getAverageSizeMatched() {
         return averageSizeMatched;
     }
 
-    public void setAverageSizeMatched(String averageSizeMatched) {
+    public void setAverageSizeMatched(BigDecimal averageSizeMatched) {
         this.averageSizeMatched = averageSizeMatched;
     }
 

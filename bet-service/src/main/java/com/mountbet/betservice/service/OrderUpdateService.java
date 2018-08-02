@@ -6,7 +6,6 @@ import com.mountbet.betservice.constant.State;
 import com.mountbet.betservice.dto.*;
 import com.mountbet.betservice.entity.BetByMarket;
 import com.mountbet.betservice.entity.key.BetByMarketKey;
-import com.mountbet.betservice.listener.OrderListener;
 import com.mountbet.betservice.listener.WebSocketListener;
 import com.mountbet.betservice.repository.BetByMarketRepository;
 import org.slf4j.Logger;
@@ -32,9 +31,6 @@ public class OrderUpdateService {
 
     @Autowired
     private WebSocketListener webSocketListener;
-
-    @Autowired
-    private OrderListener orderListener;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -85,6 +81,9 @@ public class OrderUpdateService {
             if (order.getSc() != null && order.getSc() != 0) {
                 betByMarket.setSizeCancelled(new BigDecimal(order.getSc()));
                 betByMarket.setCancelledDate(new Date());
+            }
+            if (order.getAvp() != null && order.getAvp() != 0) {
+                betByMarket.setAverageSizeMatched(new BigDecimal(order.getAvp()));
             }
             betByMarket.setSizeRemaining(new BigDecimal(order.getSr()));
             betByMarket.setSizeLapsed(new BigDecimal(order.getSl()));
