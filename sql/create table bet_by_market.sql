@@ -1,35 +1,36 @@
-CREATE TABLE bet_by_market (
+CREATE TABLE bet_by_market(
+   event_type_id bigint,
+   event_id bigint,
    market_id text,
-   id timeuuid,
-   account_id bigint,
-   bet_id bigint,
    selection_id bigint,
-   sport_id bigint,
-   state int,
-   placed_date timestamp,
-   side text,
-   absolute_ex_rate decimal,
-   avg_price_matched decimal,
-   cancelled_date timestamp,
+   bet_id bigint,
+   account_id bigint,
+
+   state text, //match, unmatch
+   side text, //back, lay
+   price decimal, //odd
    handicap decimal,
-   market_betting_type int,
-   matched_date timestamp,
-   original_id bigint,
-   partner_id int,
-   persistence_type text,
+   absolute_ex_rate decimal,
+   persistence_type text, //LAPSE, PERSIST, MARKET_ON_CLOSE
+   status text,
    placed_ip text,
-   price decimal,
-   profit decimal,
-   risk_coefficient map<bigint, decimal>,
-   risk_detail place_order_risk_detail,
-   settled_date timestamp,
-   size decimal,
-   size_cancelled decimal,
-   size_lapsed decimal,
-   size_matched decimal,
+
+   size decimal, //price
    size_placed decimal,
+   size_matched decimal,
+   size_cancelled decimal,
    size_remaining decimal,
+   size_lapsed decimal,
    size_voided decimal,
-   version int,
-   PRIMARY KEY (market_id, bet_id, id)
+   average_size_matched decimal,
+
+   placed_date timestamp,
+   matched_date timestamp,
+   cancelled_date timestamp,
+   settled_date timestamp,
+   
+   risk_coefficient map<bigint, decimal>,
+   risk_detail risk_detail,
+
+   PRIMARY KEY (market_id, event_type_id, event_id, selection_id, bet_id, account_id, state, side, status, placed_date)
 );
