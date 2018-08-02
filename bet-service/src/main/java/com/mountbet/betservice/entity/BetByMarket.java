@@ -2,9 +2,8 @@ package com.mountbet.betservice.entity;
 
 import com.datastax.driver.core.DataType;
 import com.mountbet.betservice.constant.PersistenceType;
-import com.mountbet.betservice.constant.Side;
-import com.mountbet.betservice.entity.key.BetByMarket.BetByMarketKey;
-import com.mountbet.betservice.entity.udt.BetByMarket.BetByMarketPlaceOrderRiskDetail;
+import com.mountbet.betservice.entity.key.BetByMarketKey;
+import com.mountbet.betservice.entity.udt.RiskDetail;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
@@ -14,130 +13,82 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * @author AnsonChan
- * @since 28/6/2018
- */
 @Table(value = "bet_by_market")
 public class BetByMarket {
     @PrimaryKey
     private BetByMarketKey key;
 
-    @Column(value = "absolute_ex_rate")
+    @Column(value = "price")
     @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal absoluteExRate;
-
-    @Column(value = "account_id")
-    @CassandraType(type = DataType.Name.BIGINT)
-    private Long accountId;
-
-    @Column(value = "avg_price_matched")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal avgPriceMatched;
-
-    @Column(value = "bet_id")
-    @CassandraType(type = DataType.Name.BIGINT)
-    private Long betId;
-
-    @Column(value = "cancelled_date")
-    @CassandraType(type = DataType.Name.TIMESTAMP)
-    private Date cancelledDate;
+    private BigDecimal price = new BigDecimal(0.0);
 
     @Column(value = "handicap")
     @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal handicap;
+    private BigDecimal handicap = new BigDecimal(0.0);
 
-    @Column(value = "market_betting_type")
-    @CassandraType(type = DataType.Name.INT)
-    private Integer marketBettingType;
-
-    @Column(value = "matched_date")
-    @CassandraType(type = DataType.Name.TIMESTAMP)
-    private Date matchedDate;
-
-    @Column(value = "partner_id")
-    @CassandraType(type = DataType.Name.INT)
-    private Integer partnerId;
+    @Column(value = "absolute_ex_rate")
+    @CassandraType(type = DataType.Name.DECIMAL)
+    private BigDecimal absoluteExchangeRate = new BigDecimal(0.0);
 
     @Column(value = "persistence_type")
     @CassandraType(type = DataType.Name.TEXT)
     private PersistenceType persistenceType;
 
-    @Column(value = "placed_date")
-    @CassandraType(type = DataType.Name.TIMESTAMP)
-    private Date placedDate;
-
     @Column(value = "placed_ip")
     @CassandraType(type = DataType.Name.TEXT)
     private String placedIp;
 
-    @Column(value = "price")
+    @Column(value = "average_size_matched")
     @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal price;
+    private BigDecimal averageSizeMatched = new BigDecimal(0.0);
 
-    @Column(value = "profit")
+    @Column(value = "size")
     @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal profit;
+    private BigDecimal size = new BigDecimal(0.0);
+
+    @Column(value = "size_placed")
+    @CassandraType(type = DataType.Name.DECIMAL)
+    private BigDecimal sizePlaced = new BigDecimal(0.0);
+
+    @Column(value = "size_matched")
+    @CassandraType(type = DataType.Name.DECIMAL)
+    private BigDecimal sizeMatched = new BigDecimal(0.0);
+
+    @Column(value = "size_cancelled")
+    @CassandraType(type = DataType.Name.DECIMAL)
+    private BigDecimal sizeCancelled = new BigDecimal(0.0);
+
+    @Column(value = "size_remaining")
+    @CassandraType(type = DataType.Name.DECIMAL)
+    private BigDecimal sizeRemaining = new BigDecimal(0.0);
+
+    @Column(value = "size_lapsed")
+    @CassandraType(type = DataType.Name.DECIMAL)
+    private BigDecimal sizeLapsed = new BigDecimal(0.0);
+
+    @Column(value = "size_voided")
+    @CassandraType(type = DataType.Name.DECIMAL)
+    private BigDecimal sizeVoided = new BigDecimal(0.0);
+
+    @Column(value = "matched_date")
+    @CassandraType(type = DataType.Name.TIMESTAMP)
+    private Date matchedDate;
+
+    @Column(value = "cancelled_date")
+    @CassandraType(type = DataType.Name.TIMESTAMP)
+    private Date cancelledDate;
+
+    @Column(value = "settled_date")
+    @CassandraType(type = DataType.Name.TIMESTAMP)
+    private Date settledDate;
 
     @Column(value = "risk_coefficient")
     @CassandraType(type = DataType.Name.MAP, typeArguments = {DataType.Name.BIGINT, DataType.Name.DECIMAL})
     private Map<Long, BigDecimal> riskCoefficient;
 
     @Column(value = "risk_detail")
-    @CassandraType(type = DataType.Name.UDT, userTypeName = "place_order_risk_detail")
-    private BetByMarketPlaceOrderRiskDetail riskDetail;
-
-    @Column(value = "selection_id")
-    @CassandraType(type = DataType.Name.BIGINT)
-    private Long selectionId;
-
-    @Column(value = "settled_date")
-    @CassandraType(type = DataType.Name.TIMESTAMP)
-    private Date settledDate;
-
-    @Column(value = "side")
-    @CassandraType(type = DataType.Name.TEXT)
-    private Side side;
-
-    @Column(value = "size")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal size;
-
-    @Column(value = "size_cancelled")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal sizeCancelled;
-
-    @Column(value = "size_lapsed")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal sizeLapsed;
-
-    @Column(value = "size_matched")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal sizeMatched;
-
-    @Column(value = "size_placed")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal sizePlaced;
-
-    @Column(value = "size_remaining")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal sizeRemaining;
-
-    @Column(value = "size_voided")
-    @CassandraType(type = DataType.Name.DECIMAL)
-    private BigDecimal sizeVoided;
-
-    @Column(value = "sport_id")
-    @CassandraType(type = DataType.Name.BIGINT)
-    private Long sportId;
-
-    @Column(value = "state")
-    @CassandraType(type = DataType.Name.INT)
-    private Integer state;
-
-    @Column(value = "version")
-    @CassandraType(type = DataType.Name.INT)
-    private Integer version;
+    @CassandraType(type = DataType.Name.UDT, userTypeName = "risk_detail")
+    private RiskDetail riskDetail;
 
     public BetByMarketKey getKey() {
         return key;
@@ -145,102 +96,6 @@ public class BetByMarket {
 
     public void setKey(BetByMarketKey key) {
         this.key = key;
-    }
-
-    public BigDecimal getAbsoluteExRate() {
-        return absoluteExRate;
-    }
-
-    public void setAbsoluteExRate(BigDecimal absoluteExRate) {
-        this.absoluteExRate = absoluteExRate;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
-
-    public BigDecimal getAvgPriceMatched() {
-        return avgPriceMatched;
-    }
-
-    public void setAvgPriceMatched(BigDecimal avgPriceMatched) {
-        this.avgPriceMatched = avgPriceMatched;
-    }
-
-    public Long getBetId() {
-        return betId;
-    }
-
-    public void setBetId(Long betId) {
-        this.betId = betId;
-    }
-
-    public Date getCancelledDate() {
-        return cancelledDate;
-    }
-
-    public void setCancelledDate(Date cancelledDate) {
-        this.cancelledDate = cancelledDate;
-    }
-
-    public BigDecimal getHandicap() {
-        return handicap;
-    }
-
-    public void setHandicap(BigDecimal handicap) {
-        this.handicap = handicap;
-    }
-
-    public Integer getMarketBettingType() {
-        return marketBettingType;
-    }
-
-    public void setMarketBettingType(Integer marketBettingType) {
-        this.marketBettingType = marketBettingType;
-    }
-
-    public Date getMatchedDate() {
-        return matchedDate;
-    }
-
-    public void setMatchedDate(Date matchedDate) {
-        this.matchedDate = matchedDate;
-    }
-
-    public Integer getPartnerId() {
-        return partnerId;
-    }
-
-    public void setPartnerId(Integer partnerId) {
-        this.partnerId = partnerId;
-    }
-
-    public PersistenceType getPersistenceType() {
-        return persistenceType;
-    }
-
-    public void setPersistenceType(PersistenceType persistenceType) {
-        this.persistenceType = persistenceType;
-    }
-
-    public Date getPlacedDate() {
-        return placedDate;
-    }
-
-    public void setPlacedDate(Date placedDate) {
-        this.placedDate = placedDate;
-    }
-
-    public String getPlacedIp() {
-        return placedIp;
-    }
-
-    public void setPlacedIp(String placedIp) {
-        this.placedIp = placedIp;
     }
 
     public BigDecimal getPrice() {
@@ -251,52 +106,44 @@ public class BetByMarket {
         this.price = price;
     }
 
-    public BigDecimal getProfit() {
-        return profit;
+    public BigDecimal getHandicap() {
+        return handicap;
     }
 
-    public void setProfit(BigDecimal profit) {
-        this.profit = profit;
+    public void setHandicap(BigDecimal handicap) {
+        this.handicap = handicap;
     }
 
-    public Map<Long, BigDecimal> getRiskCoefficient() {
-        return riskCoefficient;
+    public BigDecimal getAbsoluteExchangeRate() {
+        return absoluteExchangeRate;
     }
 
-    public void setRiskCoefficient(Map<Long, BigDecimal> riskCoefficient) {
-        this.riskCoefficient = riskCoefficient;
+    public void setAbsoluteExchangeRate(BigDecimal absoluteExchangeRate) {
+        this.absoluteExchangeRate = absoluteExchangeRate;
     }
 
-    public BetByMarketPlaceOrderRiskDetail getRiskDetail() {
-        return riskDetail;
+    public PersistenceType getPersistenceType() {
+        return persistenceType;
     }
 
-    public void setRiskDetail(BetByMarketPlaceOrderRiskDetail riskDetail) {
-        this.riskDetail = riskDetail;
+    public void setPersistenceType(PersistenceType persistenceType) {
+        this.persistenceType = persistenceType;
     }
 
-    public Long getSelectionId() {
-        return selectionId;
+    public String getPlacedIp() {
+        return placedIp;
     }
 
-    public void setSelectionId(Long selectionId) {
-        this.selectionId = selectionId;
+    public void setPlacedIp(String placedIp) {
+        this.placedIp = placedIp;
     }
 
-    public Date getSettledDate() {
-        return settledDate;
+    public BigDecimal getAverageSizeMatched() {
+        return averageSizeMatched;
     }
 
-    public void setSettledDate(Date settledDate) {
-        this.settledDate = settledDate;
-    }
-
-    public Side getSide() {
-        return side;
-    }
-
-    public void setSide(Side side) {
-        this.side = side;
+    public void setAverageSizeMatched(BigDecimal averageSizeMatched) {
+        this.averageSizeMatched = averageSizeMatched;
     }
 
     public BigDecimal getSize() {
@@ -307,20 +154,12 @@ public class BetByMarket {
         this.size = size;
     }
 
-    public BigDecimal getSizeCancelled() {
-        return sizeCancelled;
+    public BigDecimal getSizePlaced() {
+        return sizePlaced;
     }
 
-    public void setSizeCancelled(BigDecimal sizeCancelled) {
-        this.sizeCancelled = sizeCancelled;
-    }
-
-    public BigDecimal getSizeLapsed() {
-        return sizeLapsed;
-    }
-
-    public void setSizeLapsed(BigDecimal sizeLapsed) {
-        this.sizeLapsed = sizeLapsed;
+    public void setSizePlaced(BigDecimal sizePlaced) {
+        this.sizePlaced = sizePlaced;
     }
 
     public BigDecimal getSizeMatched() {
@@ -331,12 +170,12 @@ public class BetByMarket {
         this.sizeMatched = sizeMatched;
     }
 
-    public BigDecimal getSizePlaced() {
-        return sizePlaced;
+    public BigDecimal getSizeCancelled() {
+        return sizeCancelled;
     }
 
-    public void setSizePlaced(BigDecimal sizePlaced) {
-        this.sizePlaced = sizePlaced;
+    public void setSizeCancelled(BigDecimal sizeCancelled) {
+        this.sizeCancelled = sizeCancelled;
     }
 
     public BigDecimal getSizeRemaining() {
@@ -347,6 +186,14 @@ public class BetByMarket {
         this.sizeRemaining = sizeRemaining;
     }
 
+    public BigDecimal getSizeLapsed() {
+        return sizeLapsed;
+    }
+
+    public void setSizeLapsed(BigDecimal sizeLapsed) {
+        this.sizeLapsed = sizeLapsed;
+    }
+
     public BigDecimal getSizeVoided() {
         return sizeVoided;
     }
@@ -355,63 +202,68 @@ public class BetByMarket {
         this.sizeVoided = sizeVoided;
     }
 
-    public Long getSportId() {
-        return sportId;
+    public Date getMatchedDate() {
+        return matchedDate;
     }
 
-    public void setSportId(Long sportId) {
-        this.sportId = sportId;
+    public void setMatchedDate(Date matchedDate) {
+        this.matchedDate = matchedDate;
     }
 
-    public Integer getState() {
-        return state;
+    public Date getCancelledDate() {
+        return cancelledDate;
     }
 
-    public void setState(Integer state) {
-        this.state = state;
+    public void setCancelledDate(Date cancelledDate) {
+        this.cancelledDate = cancelledDate;
     }
 
-    public Integer getVersion() {
-        return version;
+    public Date getSettledDate() {
+        return settledDate;
     }
 
-    public void setVersion(Integer version) {
-        this.version = version;
+    public void setSettledDate(Date settledDate) {
+        this.settledDate = settledDate;
+    }
+
+    public Map<Long, BigDecimal> getRiskCoefficient() {
+        return riskCoefficient;
+    }
+
+    public void setRiskCoefficient(Map<Long, BigDecimal> riskCoefficient) {
+        this.riskCoefficient = riskCoefficient;
+    }
+
+    public RiskDetail getRiskDetail() {
+        return riskDetail;
+    }
+
+    public void setRiskDetail(RiskDetail riskDetail) {
+        this.riskDetail = riskDetail;
     }
 
     @Override
     public String toString() {
         return "BetByMarket{" +
                 "key=" + key +
-                ", absoluteExRate=" + absoluteExRate +
-                ", accountId=" + accountId +
-                ", avgPriceMatched=" + avgPriceMatched +
-                ", betId=" + betId +
-                ", cancelledDate=" + cancelledDate +
-                ", handicap=" + handicap +
-                ", marketBettingType=" + marketBettingType +
-                ", matchedDate=" + matchedDate +
-                ", partnerId=" + partnerId +
-                ", persistenceType=" + persistenceType +
-                ", placedDate=" + placedDate +
-                ", placedIp='" + placedIp + '\'' +
                 ", price=" + price +
-                ", profit=" + profit +
+                ", handicap=" + handicap +
+                ", absoluteExchangeRate=" + absoluteExchangeRate +
+                ", persistenceType=" + persistenceType +
+                ", placedIp='" + placedIp + '\'' +
+                ", averageSizeMatched='" + averageSizeMatched + '\'' +
+                ", size=" + size +
+                ", sizePlaced=" + sizePlaced +
+                ", sizeMatched=" + sizeMatched +
+                ", sizeCancelled=" + sizeCancelled +
+                ", sizeRemaining=" + sizeRemaining +
+                ", sizeLapsed=" + sizeLapsed +
+                ", sizeVoided=" + sizeVoided +
+                ", matchedDate=" + matchedDate +
+                ", cancelledDate=" + cancelledDate +
+                ", settledDate=" + settledDate +
                 ", riskCoefficient=" + riskCoefficient +
                 ", riskDetail=" + riskDetail +
-                ", selectionId=" + selectionId +
-                ", settledDate=" + settledDate +
-                ", side=" + side +
-                ", size=" + size +
-                ", sizeCancelled=" + sizeCancelled +
-                ", sizeLapsed=" + sizeLapsed +
-                ", sizeMatched=" + sizeMatched +
-                ", sizePlaced=" + sizePlaced +
-                ", sizeRemaining=" + sizeRemaining +
-                ", sizeVoided=" + sizeVoided +
-                ", sportId=" + sportId +
-                ", state=" + state +
-                ", version=" + version +
                 '}';
     }
 }

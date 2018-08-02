@@ -1,20 +1,24 @@
 package com.mountbet.betservice.service;
 
-import com.datastax.driver.core.utils.UUIDs;
+import com.mountbet.betservice.constant.Side;
+import com.mountbet.betservice.constant.State;
+import com.mountbet.betservice.constant.Status;
 import com.mountbet.betservice.dto.CancelOrder.CancelExecutionReport;
 import com.mountbet.betservice.dto.CancelOrder.CancelInstruction;
 import com.mountbet.betservice.dto.CancelOrder.CancelInstructionReport;
+import com.mountbet.betservice.dto.NavigationDetail;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceExecutionReport;
+import com.mountbet.betservice.dto.PlaceOrder.PlaceInstruction;
 import com.mountbet.betservice.dto.PlaceOrder.PlaceInstructionReport;
 import com.mountbet.betservice.dto.ReplaceOrder.ReplaceExecutionReport;
 import com.mountbet.betservice.dto.ReplaceOrder.ReplaceInstructionReport;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
+import com.mountbet.betservice.dto.UpdateOrder.UpdateInstruction;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateInstructionReport;
-import com.mountbet.betservice.entity.BetByBetId;
 import com.mountbet.betservice.entity.BetByMarket;
-import com.mountbet.betservice.entity.key.BetByMarket.BetByMarketKey;
-import com.mountbet.betservice.repository.BetByBetIdRepository;
+import com.mountbet.betservice.entity.key.BetByMarketKey;
 import com.mountbet.betservice.repository.BetByMarketRepository;
+import com.mountbet.betservice.client.NavigationClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-/**
- * @author AnsonChan
- * @since 4/7/2018
- */
 @Service
 @Transactional
 public class BetByMarketService {
@@ -39,7 +39,7 @@ public class BetByMarketService {
     private BetByMarketRepository betByMarketRepository;
 
     @Autowired
-    private BetByBetIdRepository betByBetIdRepository;
+    private NavigationClient navigationClient;
 
     public void placeBet(PlaceExecutionReport placeExecutionReport) {
         String marketId = placeExecutionReport.getMarketId();
@@ -51,46 +51,37 @@ public class BetByMarketService {
 
     public void doPlaceBet(PlaceInstructionReport placeInstructionReport, String marketId) {
         if (placeInstructionReport.getStatus().equals("SUCCESS")) {
+            PlaceInstruction placeInstruction = placeInstructionReport.getInstruction();
+            NavigationDetail navigationDetail = navigationClient.getMarketDetails(marketId);
             BetByMarket betByMarket = new BetByMarket();
-
-            betByMarket.setKey(buildBetByMarketKey(marketId));
-            betByMarket.setSelectionId(placeInstructionReport.getInstruction().getSelectionId());
+            betByMarket.setKey(buildBetByMarketKey(marketId, navigationDetail.getEventTypeId(), navigationDetail.getEventId(), placeInstruction.getSelectionId(), placeInstructionReport.getBetId(), 100l, State.UNMATCHED, placeInstruction.getSide(), Status.CURRENT, placeInstructionReport.getPlacedDate()));
             betByMarket.setHandicap(placeInstructionReport.getInstruction().getHandicap());
-            betByMarket.setSide(placeInstructionReport.getInstruction().getSide());
-
             betByMarket.setSize(placeInstructionReport.getInstruction().getLimitOrder().getSize());
             betByMarket.setPrice(placeInstructionReport.getInstruction().getLimitOrder().getPrice());
             betByMarket.setPersistenceType(placeInstructionReport.getInstruction().getLimitOrder().getPersistenceType());
-
-            betByMarket.setBetId(Long.parseLong(placeInstructionReport.getBetId()));
-            betByMarket.setPlacedDate(placeInstructionReport.getPlacedDate());
-            betByMarket.setAvgPriceMatched(new BigDecimal(placeInstructionReport.getAveragePriceMatched(), MathContext.DECIMAL64));
             betByMarket.setSizeMatched(new BigDecimal(placeInstructionReport.getSizeMatched(), MathContext.DECIMAL64));
-
-            betByMarketRepository.insert(betByMarket);
+            betByMarket.setSizeRemaining(placeInstructionReport.getInstruction().getLimitOrder().getSize().subtract(new BigDecimal(placeInstructionReport.getSizeMatched())));
+            betByMarket.setSizePlaced(betByMarket.getSize());
+            betByMarketRepository.saveBet(betByMarket);
         } else {
             LOG.error("Status failed in doPlaceBet: " + placeInstructionReport.getErrorCode());
         }
     }
 
     public void cancelBet(CancelExecutionReport cancelExecutionReport) {
-        String marketId = cancelExecutionReport.getMarketId();
         List<CancelInstructionReport> cancelInstructionReportList = cancelExecutionReport.getInstructionReports();
         for (CancelInstructionReport cancelInstructionReport : cancelInstructionReportList) {
-            doCancelBet(cancelInstructionReport, marketId);
+            doCancelBet(cancelInstructionReport);
         }
     }
 
-    public void doCancelBet(CancelInstructionReport cancelInstructionReport, String marketId) {
+    public void doCancelBet(CancelInstructionReport cancelInstructionReport) {
         if (cancelInstructionReport.getStatus().equals("SUCCESS")) {
             CancelInstruction cancelInstruction = cancelInstructionReport.getInstruction();
-            Long oldBetId = cancelInstruction.getBetId();
-            BetByBetId betByBetId = betByBetIdRepository.findByKeyMarketIdAndBetId(marketId, oldBetId);
-            BigDecimal newSize = betByBetId.getSize().subtract(new BigDecimal(cancelInstructionReport.getSizeCancelled()));
-            UUID id = betByBetId.getKey().getId();
-            BetByMarket betByMarket = betByMarketRepository.findByKeyMarketIdAndKeyId(marketId, id);
+            BetByMarket betByMarket = betByMarketRepository.findBetByBetId(cancelInstruction.getBetId());
+            BigDecimal newSize = betByMarket.getSize().subtract(new BigDecimal(cancelInstructionReport.getSizeCancelled()));
             betByMarket.setSize(newSize);
-            betByMarketRepository.save(betByMarket);
+            betByMarketRepository.saveBet(betByMarket);
         } else {
             LOG.error("Status failed in doCancelBet: " + cancelInstructionReport.getErrorCode());
         }
@@ -102,32 +93,37 @@ public class BetByMarketService {
         for (ReplaceInstructionReport replaceInstructionReport : replaceInstructionReportList) {
             CancelInstructionReport cancelInstructionReport = replaceInstructionReport.getCancelInstructionReport();
             PlaceInstructionReport placeInstructionReport = replaceInstructionReport.getPlaceInstructionReport();
-            doCancelBet(cancelInstructionReport, marketId);
+            doCancelBet(cancelInstructionReport);
             doPlaceBet(placeInstructionReport, marketId);
         }
     }
 
-    public void updateBet(UpdateExecutionReport updateExecutionReport){
-        String marketId = updateExecutionReport.getMarketId();
+    public void updateBet(UpdateExecutionReport updateExecutionReport) {
         List<UpdateInstructionReport> updateInstructionReportList = updateExecutionReport.getInstructionReports();
-        for(UpdateInstructionReport updateInstructionReport: updateInstructionReportList){
-            if(updateExecutionReport.getStatus().equals("SUCCESS")){
-                Long betId = updateInstructionReport.getInstruction().getBetId();
-                BetByBetId betByBetId = betByBetIdRepository.findByKeyMarketIdAndBetId(marketId, betId);
-                UUID id = betByBetId.getKey().getId();
-                BetByMarket betByMarket = betByMarketRepository.findByKeyMarketIdAndKeyId(marketId,id);
-                betByMarket.setPersistenceType(updateInstructionReport.getInstruction().getNewPersistenceType());
-                betByMarketRepository.save(betByMarket);
-            }else{
+        for (UpdateInstructionReport updateInstructionReport : updateInstructionReportList) {
+            if (updateExecutionReport.getStatus().equals("SUCCESS")) {
+                UpdateInstruction updateInstruction = updateInstructionReport.getInstruction();
+                BetByMarket betByMarket = betByMarketRepository.findBetByBetId(updateInstruction.getBetId());
+                betByMarket.setPersistenceType(updateInstruction.getNewPersistenceType());
+                betByMarketRepository.saveBet(betByMarket);
+            } else {
                 LOG.error("Status failed in updateBet: " + updateInstructionReport.getErrorCode());
             }
         }
     }
 
-    private BetByMarketKey buildBetByMarketKey(String marketId) {
+    private BetByMarketKey buildBetByMarketKey(String marketId, Long eventTypeId, Long eventId, Long selectionId, Long betId, Long accountId, State state, Side side, Status status, Date placedDate) {
         BetByMarketKey key = new BetByMarketKey();
         key.setMarketId(marketId);
-        key.setId(UUIDs.timeBased());
+        key.setEventTypeId(eventTypeId);
+        key.setEventId(eventId);
+        key.setSelectionId(selectionId);
+        key.setBetId(betId);
+        key.setAccountId(accountId);
+        key.setState(state);
+        key.setSide(side);
+        key.setStatus(status);
+        key.setPlacedDate(placedDate);
         return key;
     }
 }

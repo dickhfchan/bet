@@ -12,7 +12,7 @@ public class PlaceInstructionReport implements Serializable {
     private String errorCode;
     private OrderStatus orderStatus;
     private PlaceInstruction instruction;
-    private String betId;
+    private Long betId;
     private Date placedDate;
     private Double averagePriceMatched;
     private Double sizeMatched;
@@ -49,11 +49,11 @@ public class PlaceInstructionReport implements Serializable {
         this.instruction = instruction;
     }
 
-    public String getBetId() {
+    public Long getBetId() {
         return this.betId;
     }
 
-    public void setBetId(String betId) {
+    public void setBetId(Long betId) {
         this.betId = betId;
     }
 
