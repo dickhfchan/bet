@@ -90,6 +90,10 @@ public class BetByMarket {
     @CassandraType(type = DataType.Name.UDT, userTypeName = "risk_detail")
     private RiskDetail riskDetail;
 
+    @Column(value = "bet_count")
+    @CassandraType(type = DataType.Name.INT)
+    private Integer betCount;
+
     public BetByMarketKey getKey() {
         return key;
     }
@@ -242,6 +246,14 @@ public class BetByMarket {
         this.riskDetail = riskDetail;
     }
 
+    public Integer getBetCount() {
+        return betCount;
+    }
+
+    public void setBetCount(Integer betCount) {
+        this.betCount = betCount;
+    }
+
     @Override
     public String toString() {
         return "BetByMarket{" +
@@ -251,7 +263,7 @@ public class BetByMarket {
                 ", absoluteExchangeRate=" + absoluteExchangeRate +
                 ", persistenceType=" + persistenceType +
                 ", placedIp='" + placedIp + '\'' +
-                ", averageSizeMatched='" + averageSizeMatched + '\'' +
+                ", averageSizeMatched=" + averageSizeMatched +
                 ", size=" + size +
                 ", sizePlaced=" + sizePlaced +
                 ", sizeMatched=" + sizeMatched +
@@ -264,6 +276,7 @@ public class BetByMarket {
                 ", settledDate=" + settledDate +
                 ", riskCoefficient=" + riskCoefficient +
                 ", riskDetail=" + riskDetail +
+                ", betCount=" + betCount +
                 '}';
     }
 }
