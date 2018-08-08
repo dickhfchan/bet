@@ -5,4 +5,4 @@ BetUpdate streaming api:
   - Bet updates messages are sent from server to client immediately after convert to dto on each bet change.
 
 Order subscription:
-  - subscribes to orders changes events and update bet data on cassandra <br> Example: order matched, order cancelled, price changed
+  - subscribes betfair orders changes and update cassandra bet data <br> Example: order matched, order cancelled, price changed
