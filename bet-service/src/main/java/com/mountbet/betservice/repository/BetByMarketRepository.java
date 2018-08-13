@@ -38,7 +38,7 @@ public class BetByMarketRepository {
                 .select()
                 .from("bet_by_bet_id")
                 .where(QueryBuilder.eq("bet_id", betId));
-        BetByMarket betByMarket = cassandraOperations.selectOne(select, BetByMarketForAccountService.class);
+        BetByMarket betByMarket = cassandraOperations.selectOne(select, BetByMarket.class);
         return betByMarket;
     }
 
@@ -183,18 +183,18 @@ public class BetByMarketRepository {
                 "event_type_id",
                 "event_id",
                 "market_id"
-        ).from("bet_by_mid")
+        ).from("bet_by_mid_aid")
                 .where(QueryBuilder.in("market_id", marketIdsSet))
                 .groupBy("market_id");
         LOG.debug("getPastBetByMarketId select:" + select.toString());
         List<BetByMarketForAccountService> resultList = cassandraOperations.select(select, BetByMarketForAccountService.class);
         List<BetByMarketForAccountService> finalList = new ArrayList<>();
         for (BetByMarketForAccountService betByMarket : resultList) {
-            Select.Where selectMaxSettledDate = QueryBuilder.select(QueryBuilder.max("settled_date")).from("bet_by_mid")
+            Select.Where selectMaxSettledDate = QueryBuilder.select(QueryBuilder.max("settled_date")).from("bet_by_mid_aid")
                     .where(QueryBuilder.eq("market_id", betByMarket.getKey().getMarketId()));
-            Select.Where selectCountBetId = QueryBuilder.select(QueryBuilder.count("bet_id")).from("bet_by_mid")
+            Select.Where selectCountBetId = QueryBuilder.select(QueryBuilder.count("bet_id")).from("bet_by_mid_aid")
                     .where(QueryBuilder.eq("market_id", betByMarket.getKey().getMarketId()));
-            Select.Where selectMaxSizeVoided = QueryBuilder.select(QueryBuilder.sum("size_voided")).from("bet_by_mid")
+            Select.Where selectMaxSizeVoided = QueryBuilder.select(QueryBuilder.sum("size_voided")).from("bet_by_mid_aid")
                     .where(QueryBuilder.eq("market_id", betByMarket.getKey().getMarketId()));
             Date maxSettledDate = cassandraOperations.selectOne(selectMaxSettledDate, Date.class);
             Integer countBetId = cassandraOperations.selectOne(selectCountBetId, Integer.class);
@@ -263,7 +263,13 @@ public class BetByMarketRepository {
         return finalList;
     }
 
-
+    public double getSumOfSizeMatchedByMarketId(String marketId){
+        Select.Where selectWhere = QueryBuilder.select(QueryBuilder.sum("size_matched"))
+                .from("bet_by_market")
+                .where(QueryBuilder.eq("market_id",marketId));
+        double result = cassandraOperations.selectOne(selectWhere, Double.class);
+        return result;
+    }
 
     private Set<String> getState(OrderProjection orderProjection) {
         Set<String> state = new HashSet<>();

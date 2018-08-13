@@ -142,4 +142,12 @@ public class BetController {
         LOG.debug(eventTypeIdsList.toString());
         return betByMarketRepository.getPastBetByEventTypeId(eventTypeIdsList);
     }
+
+    @GetMapping(path = "/getSumOfSizeMatchedByMarketId/{marketId}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public double getSumOfSizeMatchedByMarketId(@PathVariable(value = "marketId") String marketId) {
+        LOG.debug("/getSumOfSizeMatchedByMarketId");
+        LOG.debug(marketId);
+        double result = betByMarketRepository.getSumOfSizeMatchedByMarketId(marketId);
+        return result;
+    }
 }
