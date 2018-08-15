@@ -251,7 +251,7 @@ public class BetByMarket {
                 ", absoluteExchangeRate=" + absoluteExchangeRate +
                 ", persistenceType=" + persistenceType +
                 ", placedIp='" + placedIp + '\'' +
-                ", averageSizeMatched='" + averageSizeMatched + '\'' +
+                ", averageSizeMatched=" + averageSizeMatched +
                 ", size=" + size +
                 ", sizePlaced=" + sizePlaced +
                 ", sizeMatched=" + sizeMatched +
