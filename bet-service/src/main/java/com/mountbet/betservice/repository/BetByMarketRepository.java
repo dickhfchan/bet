@@ -263,10 +263,10 @@ public class BetByMarketRepository {
         return finalList;
     }
 
-    public double getSumOfSizeMatchedByMarketId(String marketId){
+    public double getSumOfSizeMatchedByMarketId(String marketId) {
         Select.Where selectWhere = QueryBuilder.select(QueryBuilder.sum("size_matched"))
                 .from("bet_by_market")
-                .where(QueryBuilder.eq("market_id",marketId));
+                .where(QueryBuilder.eq("market_id", marketId));
         double result = cassandraOperations.selectOne(selectWhere, Double.class);
         return result;
     }
