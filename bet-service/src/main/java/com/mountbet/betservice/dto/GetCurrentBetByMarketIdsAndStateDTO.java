@@ -2,11 +2,13 @@ package com.mountbet.betservice.dto;
 
 import com.mountbet.betservice.constant.OrderProjection;
 
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 public class GetCurrentBetByMarketIdsAndStateDTO {
     private Set<String> marketIdsSet;
 
+    @NotNull
     private Long accountId;
 
     private TimeRange timeRange;

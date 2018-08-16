@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -45,7 +46,7 @@ public class BetByMarketRepository {
 
     //Below method will be called by account-service
 
-    public List<BetByMarket> getCurrentBetByState(Long accountId, TimeRange timeRange, OrderProjection orderProjection) {
+    public List<BetByMarket> getCurrentBetByState(@NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection) {
         Set<String> state = getState(orderProjection);
         Select.Where selectWhere = QueryBuilder.select().from("bet_by_state_aid")
                 .where(QueryBuilder.in("state", state))
@@ -57,7 +58,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<BetByMarket> getCurrentBetByMarketIdsAndState(Set<String> marketIdsSet, Long accountId, TimeRange timeRange, OrderProjection orderProjection) {
+    public List<BetByMarket> getCurrentBetByMarketIdsAndState(Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection) {
         Set<String> state = getState(orderProjection);
         Select.Where selectWhere = QueryBuilder.select().from("bet_by_mid_state_aid")
                 .where(QueryBuilder.in("market_id", marketIdsSet))
@@ -70,7 +71,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetId(String selectColumns, Set<String> state, Long accountId, TimeRange timeRange) {
+    public List<Long> getPastBetId(String selectColumns, Set<String> state, @NotNull Long accountId, TimeRange timeRange) {
         Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.eq("account_id", accountId))
@@ -81,7 +82,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByEventTypeIds(String selectColumns, Set<String> state, Set<String> eventTypeIdsSet, Long accountId, TimeRange timeRange) {
+    public List<Long> getPastBetIdByEventTypeIds(String selectColumns, Set<String> state, Set<String> eventTypeIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_etid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("event_type_id", eventTypeIdsSet))
@@ -93,7 +94,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByEventIds(String selectColumns, Set<String> state, Set<String> eventIdsSet, Long accountId, TimeRange timeRange) {
+    public List<Long> getPastBetIdByEventIds(String selectColumns, Set<String> state, Set<String> eventIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_eid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("event_id", eventIdsSet))
@@ -105,7 +106,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByMarketIds(String selectColumns, Set<String> state, Set<String> marketIdsSet, Long accountId, TimeRange timeRange) {
+    public List<Long> getPastBetIdByMarketIds(String selectColumns, Set<String> state, Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_mid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("market_id", marketIdsSet))
@@ -117,7 +118,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByBetIds(String selectColumns, Set<String> state, Set<String> betIdsSet, Long accountId, TimeRange timeRange) {
+    public List<Long> getPastBetIdByBetIds(String selectColumns, Set<String> state, Set<String> betIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_bid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("bet_id", betIdsSet))

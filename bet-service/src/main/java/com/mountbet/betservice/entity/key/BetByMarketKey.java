@@ -9,46 +9,57 @@ import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @PrimaryKeyClass
 public class BetByMarketKey {
+    @NotNull
     @PrimaryKeyColumn(name = "market_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
     @CassandraType(type = DataType.Name.TEXT)
     private String marketId;
 
+    @NotNull
     @PrimaryKeyColumn(name = "event_type_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.BIGINT)
     private Long eventTypeId;
 
+    @NotNull
     @PrimaryKeyColumn(name = "event_id", ordinal = 2, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.BIGINT)
     private Long eventId;
 
+    @NotNull
     @PrimaryKeyColumn(name = "selection_id", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.BIGINT)
     private Long selectionId;
 
+    @NotNull
     @PrimaryKeyColumn(name = "bet_id", ordinal = 4, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.BIGINT)
     private Long betId;
 
+    @NotNull
     @PrimaryKeyColumn(name = "account_id", ordinal = 5, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.BIGINT)
     private Long accountId;
 
+    @NotNull
     @PrimaryKeyColumn(name = "state", ordinal = 6, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.TEXT)
     private State state;
 
+    @NotNull
     @PrimaryKeyColumn(name = "side", ordinal = 7, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.TEXT)
     private Side side;
 
+    @NotNull
     @PrimaryKeyColumn(name = "status", ordinal = 8, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.TEXT)
     private Status status;
 
+    @NotNull
     @PrimaryKeyColumn(name = "placed_date", ordinal = 9, type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.TIMESTAMP)
     private Date placedDate;

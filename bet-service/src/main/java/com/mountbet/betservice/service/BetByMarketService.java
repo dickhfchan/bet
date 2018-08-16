@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Date;
@@ -45,7 +46,7 @@ public class BetByMarketService {
     @Autowired
     private NavigationClient navigationClient;
 
-    public List<BetByMarket> getCurrentBetByState(Long accountId, TimeRange timeRange, OrderProjection orderProjection){
+    public List<BetByMarket> getCurrentBetByState(@NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection){
         return betByMarketRepository.getCurrentBetByState(
                 accountId,
                 timeRange,
@@ -53,7 +54,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<BetByMarket> getCurrentBetByMarketIdsAndState(Set<String> marketIdsSet, Long accountId, TimeRange timeRange, OrderProjection orderProjection){
+    public List<BetByMarket> getCurrentBetByMarketIdsAndState(Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection){
         return betByMarketRepository.getCurrentBetByMarketIdsAndState(
                 marketIdsSet,
                 accountId,
@@ -62,7 +63,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetId(String selectColumns, Set<String> state, Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetId(String selectColumns, Set<String> state, @NotNull Long accountId,  TimeRange timeRange){
         return betByMarketRepository.getPastBetId(
                 selectColumns,
                 state,
@@ -71,7 +72,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByEventTypeIds(String selectColumns, Set<String> state,Set<String> eventTypeIdsSet, Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetIdByEventTypeIds(String selectColumns, Set<String> state, Set<String> eventTypeIdsSet, @NotNull Long accountId, TimeRange timeRange){
         return betByMarketRepository.getPastBetIdByEventTypeIds(
                 selectColumns,
                 state,
@@ -81,7 +82,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByEventIds(String selectColumns, Set<String> state,Set<String> eventIdsSet, Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetIdByEventIds(String selectColumns, Set<String> state, Set<String> eventIdsSet, @NotNull Long accountId,  TimeRange timeRange){
         return betByMarketRepository.getPastBetIdByEventIds(
                 selectColumns,
                 state,
@@ -91,7 +92,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByMarketIds(String selectColumns, Set<String> state,Set<String> marketIdsSet, Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetIdByMarketIds(String selectColumns, Set<String> state, Set<String> marketIdsSet, @NotNull Long accountId,  TimeRange timeRange){
         return betByMarketRepository.getPastBetIdByMarketIds(
                 selectColumns,
                 state,
@@ -101,17 +102,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByBetIds(String selectColumns, Set<String> state,Set<String> betIdsSet, Long accountId,  TimeRange timeRange){
-        return betByMarketRepository.getPastBetIdByBetIds(
-                selectColumns,
-                state,
-                betIdsSet,
-                accountId,
-                timeRange
-        );
-    }
-
-    public List<Long> getPastBetByBetId(String selectColumns, Set<String> state,Set<String> betIdsSet, Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetIdByBetIds(String selectColumns, Set<String> state, Set<String> betIdsSet, @NotNull Long accountId,  TimeRange timeRange){
         return betByMarketRepository.getPastBetIdByBetIds(
                 selectColumns,
                 state,

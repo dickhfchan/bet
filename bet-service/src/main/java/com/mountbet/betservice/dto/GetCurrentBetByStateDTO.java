@@ -2,7 +2,10 @@ package com.mountbet.betservice.dto;
 
 import com.mountbet.betservice.constant.OrderProjection;
 
+import javax.validation.constraints.NotNull;
+
 public class GetCurrentBetByStateDTO {
+    @NotNull
     private Long accountId;
 
     private TimeRange timeRange;

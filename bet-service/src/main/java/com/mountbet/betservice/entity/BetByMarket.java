@@ -9,6 +9,8 @@ import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
@@ -16,6 +18,8 @@ import java.util.Map;
 @Table(value = "bet_by_market")
 public class BetByMarket {
     @PrimaryKey
+    @NotNull
+    @Valid
     private BetByMarketKey key;
 
     @Column(value = "price")
@@ -88,6 +92,7 @@ public class BetByMarket {
 
     @Column(value = "risk_detail")
     @CassandraType(type = DataType.Name.UDT, userTypeName = "risk_detail")
+    @Valid
     private RiskDetail riskDetail;
 
     public BetByMarketKey getKey() {

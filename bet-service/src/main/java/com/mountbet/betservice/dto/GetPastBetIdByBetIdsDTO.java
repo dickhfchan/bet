@@ -1,5 +1,6 @@
 package com.mountbet.betservice.dto;
 
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 public class GetPastBetIdByBetIdsDTO {
@@ -7,8 +8,9 @@ public class GetPastBetIdByBetIdsDTO {
 
     Set<String> state;
 
-    java.util.Set<String> betIdsSet;
+    Set<String> betIdsSet;
 
+    @NotNull
     Long accountId;
 
     TimeRange timeRange;
