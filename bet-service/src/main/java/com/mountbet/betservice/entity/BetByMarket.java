@@ -4,11 +4,14 @@ import com.datastax.driver.core.DataType;
 import com.mountbet.betservice.constant.PersistenceType;
 import com.mountbet.betservice.entity.key.BetByMarketKey;
 import com.mountbet.betservice.entity.udt.RiskDetail;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
@@ -16,6 +19,8 @@ import java.util.Map;
 @Table(value = "bet_by_market")
 public class BetByMarket {
     @PrimaryKey
+    @NotNull
+    @Valid
     private BetByMarketKey key;
 
     @Column(value = "price")
@@ -88,7 +93,11 @@ public class BetByMarket {
 
     @Column(value = "risk_detail")
     @CassandraType(type = DataType.Name.UDT, userTypeName = "risk_detail")
+    @Valid
     private RiskDetail riskDetail;
+
+    @Transient
+    private Integer betCount;
 
     public BetByMarketKey getKey() {
         return key;
@@ -242,6 +251,14 @@ public class BetByMarket {
         this.riskDetail = riskDetail;
     }
 
+    public Integer getBetCount() {
+        return betCount;
+    }
+
+    public void setBetCount(Integer betCount) {
+        this.betCount = betCount;
+    }
+
     @Override
     public String toString() {
         return "BetByMarket{" +
@@ -251,7 +268,7 @@ public class BetByMarket {
                 ", absoluteExchangeRate=" + absoluteExchangeRate +
                 ", persistenceType=" + persistenceType +
                 ", placedIp='" + placedIp + '\'' +
-                ", averageSizeMatched='" + averageSizeMatched + '\'' +
+                ", averageSizeMatched=" + averageSizeMatched +
                 ", size=" + size +
                 ", sizePlaced=" + sizePlaced +
                 ", sizeMatched=" + sizeMatched +
