@@ -4,6 +4,7 @@ import com.datastax.driver.core.DataType;
 import com.mountbet.betservice.constant.PersistenceType;
 import com.mountbet.betservice.entity.key.BetByMarketKey;
 import com.mountbet.betservice.entity.udt.RiskDetail;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
@@ -94,6 +95,9 @@ public class BetByMarket {
     @CassandraType(type = DataType.Name.UDT, userTypeName = "risk_detail")
     @Valid
     private RiskDetail riskDetail;
+
+    @Transient
+    private Integer betCount;
 
     public BetByMarketKey getKey() {
         return key;
@@ -245,6 +249,14 @@ public class BetByMarket {
 
     public void setRiskDetail(RiskDetail riskDetail) {
         this.riskDetail = riskDetail;
+    }
+
+    public Integer getBetCount() {
+        return betCount;
+    }
+
+    public void setBetCount(Integer betCount) {
+        this.betCount = betCount;
     }
 
     @Override

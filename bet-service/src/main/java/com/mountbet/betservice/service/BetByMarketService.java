@@ -18,7 +18,6 @@ import com.mountbet.betservice.dto.UpdateOrder.UpdateExecutionReport;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateInstruction;
 import com.mountbet.betservice.dto.UpdateOrder.UpdateInstructionReport;
 import com.mountbet.betservice.entity.BetByMarket;
-import com.mountbet.betservice.entity.BetByMarketForAccountService;
 import com.mountbet.betservice.entity.key.BetByMarketKey;
 import com.mountbet.betservice.repository.BetByMarketRepository;
 import com.mountbet.betservice.client.NavigationClient;
@@ -112,23 +111,23 @@ public class BetByMarketService {
         );
     }
 
-    public List<BetByMarketForAccountService> getPastBetByBetId(List<Long> betIdsList){
+    public List<BetByMarket> getPastBetByBetId(List<Long> betIdsList){
         return betByMarketRepository.getPastBetByBetId(betIdsList);
     }
 
-    public List<BetByMarketForAccountService> getPastBetBySelectionId(List<Long> selectionIdsList){
+    public List<BetByMarket> getPastBetBySelectionId(List<Long> selectionIdsList){
         return betByMarketRepository.getPastBetBySelectionId(selectionIdsList);
     }
 
-    public List<BetByMarketForAccountService> getPastBetByMarketId(List<Long> marketIdsList){
+    public List<BetByMarket> getPastBetByMarketId(List<Long> marketIdsList){
         return betByMarketRepository.getPastBetByMarketId(marketIdsList);
     }
 
-    public List<BetByMarketForAccountService> getPastBetByEventId(List<Long> eventIdsList){
+    public List<BetByMarket> getPastBetByEventId(List<Long> eventIdsList){
         return betByMarketRepository.getPastBetByEventId(eventIdsList);
     }
 
-    public List<BetByMarketForAccountService> getPastBetByEventTypeId(List<Long> eventTypeIdsList){
+    public List<BetByMarket> getPastBetByEventTypeId(List<Long> eventTypeIdsList){
         return betByMarketRepository.getPastBetByEventTypeId(eventTypeIdsList);
     }
 

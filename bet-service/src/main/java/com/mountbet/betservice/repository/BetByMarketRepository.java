@@ -5,7 +5,7 @@ import com.datastax.driver.core.querybuilder.Select;
 import com.mountbet.betservice.constant.OrderProjection;
 import com.mountbet.betservice.dto.TimeRange;
 import com.mountbet.betservice.entity.BetByMarket;
-import com.mountbet.betservice.entity.BetByMarketForAccountService;
+import com.mountbet.betservice.entity.BetByMarket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,16 +130,16 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<BetByMarketForAccountService> getPastBetByBetId(List<Long> betIdsList) {
+    public List<BetByMarket> getPastBetByBetId(List<Long> betIdsList) {
         Set<Long> betIdsSet = new HashSet<Long>(betIdsList);
         Select select = QueryBuilder.select().from("bet_by_bet_id")
                 .where(QueryBuilder.in("bet_id", betIdsSet))
                 .groupBy("bet_id");
-        List<BetByMarketForAccountService> resultList = cassandraOperations.select(select, BetByMarketForAccountService.class);
+        List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
         return resultList;
     }
 
-    public List<BetByMarketForAccountService> getPastBetBySelectionId(List<Long> selectionIdsList) {
+    public List<BetByMarket> getPastBetBySelectionId(List<Long> selectionIdsList) {
         Set<Long> selectionIdsSet = new HashSet<Long>(selectionIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id",
@@ -152,9 +152,9 @@ public class BetByMarketRepository {
                 .where(QueryBuilder.in("selection_id", selectionIdsSet))
                 .groupBy("selection_id");
         LOG.debug("getPastBetBySelectionId select:" + select.toString());
-        List<BetByMarketForAccountService> resultList = cassandraOperations.select(select, BetByMarketForAccountService.class);
-        List<BetByMarketForAccountService> finalList = new ArrayList<>();
-        for (BetByMarketForAccountService betByMarket : resultList) {
+        List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
+        List<BetByMarket> finalList = new ArrayList<>();
+        for (BetByMarket betByMarket : resultList) {
             Select.Where selectMaxSettledDate = QueryBuilder.select(QueryBuilder.max("settled_date")).from("bet_by_sid")
                     .where(QueryBuilder.eq("selection_id", betByMarket.getKey().getSelectionId()));
             Select.Where selectCountBetId = QueryBuilder.select(QueryBuilder.count("bet_id")).from("bet_by_sid")
@@ -178,7 +178,7 @@ public class BetByMarketRepository {
         return finalList;
     }
 
-    public List<BetByMarketForAccountService> getPastBetByMarketId(List<Long> marketIdsList) {
+    public List<BetByMarket> getPastBetByMarketId(List<Long> marketIdsList) {
         Set<Long> marketIdsSet = new HashSet<Long>(marketIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id",
@@ -188,9 +188,9 @@ public class BetByMarketRepository {
                 .where(QueryBuilder.in("market_id", marketIdsSet))
                 .groupBy("market_id");
         LOG.debug("getPastBetByMarketId select:" + select.toString());
-        List<BetByMarketForAccountService> resultList = cassandraOperations.select(select, BetByMarketForAccountService.class);
-        List<BetByMarketForAccountService> finalList = new ArrayList<>();
-        for (BetByMarketForAccountService betByMarket : resultList) {
+        List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
+        List<BetByMarket> finalList = new ArrayList<>();
+        for (BetByMarket betByMarket : resultList) {
             Select.Where selectMaxSettledDate = QueryBuilder.select(QueryBuilder.max("settled_date")).from("bet_by_mid_aid")
                     .where(QueryBuilder.eq("market_id", betByMarket.getKey().getMarketId()));
             Select.Where selectCountBetId = QueryBuilder.select(QueryBuilder.count("bet_id")).from("bet_by_mid_aid")
@@ -210,7 +210,7 @@ public class BetByMarketRepository {
         return finalList;
     }
 
-    public List<BetByMarketForAccountService> getPastBetByEventId(List<Long> eventIdsList) {
+    public List<BetByMarket> getPastBetByEventId(List<Long> eventIdsList) {
         Set<Long> eventIdsSet = new HashSet<Long>(eventIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id",
@@ -219,9 +219,9 @@ public class BetByMarketRepository {
                 .where(QueryBuilder.in("event_id", eventIdsSet))
                 .groupBy("event_id");
         LOG.debug("getPastBetByEventId select:" + select.toString());
-        List<BetByMarketForAccountService> resultList = cassandraOperations.select(select, BetByMarketForAccountService.class);
-        List<BetByMarketForAccountService> finalList = new ArrayList<>();
-        for (BetByMarketForAccountService betByMarket : resultList) {
+        List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
+        List<BetByMarket> finalList = new ArrayList<>();
+        for (BetByMarket betByMarket : resultList) {
             Select.Where selectMaxSettledDate = QueryBuilder.select(QueryBuilder.max("settled_date")).from("bet_by_eid")
                     .where(QueryBuilder.eq("event_id", betByMarket.getKey().getEventId()));
             Select.Where selectCountBetId = QueryBuilder.select(QueryBuilder.count("bet_id")).from("bet_by_eid")
@@ -238,7 +238,7 @@ public class BetByMarketRepository {
     }
 
 
-    public List<BetByMarketForAccountService> getPastBetByEventTypeId(List<Long> eventTypeIdsList) {
+    public List<BetByMarket> getPastBetByEventTypeId(List<Long> eventTypeIdsList) {
         Set<Long> eventTypeIdsSet = new HashSet<Long>(eventTypeIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id"
@@ -246,9 +246,9 @@ public class BetByMarketRepository {
                 .where(QueryBuilder.in("event_type_id", eventTypeIdsSet))
                 .groupBy("event_type_id");
         LOG.debug("getPastBetByEventTypeId select:" + select.toString());
-        List<BetByMarketForAccountService> resultList = cassandraOperations.select(select, BetByMarketForAccountService.class);
-        List<BetByMarketForAccountService> finalList = new ArrayList<>();
-        for (BetByMarketForAccountService betByMarket : resultList) {
+        List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
+        List<BetByMarket> finalList = new ArrayList<>();
+        for (BetByMarket betByMarket : resultList) {
             Select.Where selectMaxSettledDate = QueryBuilder.select(QueryBuilder.max("settled_date")).from("bet_by_etid")
                     .where(QueryBuilder.eq("event_type_id", betByMarket.getKey().getEventTypeId()));
             Select.Where selectCountBetId = QueryBuilder.select(QueryBuilder.count("bet_id")).from("bet_by_etid")

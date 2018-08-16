@@ -2,7 +2,6 @@ package com.mountbet.betservice.controller;
 
 import com.mountbet.betservice.dto.*;
 import com.mountbet.betservice.entity.BetByMarket;
-import com.mountbet.betservice.entity.BetByMarketForAccountService;
 import com.mountbet.betservice.service.BetByMarketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,35 +108,35 @@ public class BetController {
     }
 
     @PostMapping(path = "/getPastBetByBetId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarketForAccountService> getPastBetByBetId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> betIdsList) {
+    public List<BetByMarket> getPastBetByBetId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> betIdsList) {
         LOG.debug("/getPastBetIdByBetIds");
         LOG.debug(betIdsList.toString());
         return betByMarketService.getPastBetByBetId(betIdsList);
     }
 
     @PostMapping(path = "/getPastBetBySelectionId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarketForAccountService> getPastBetBySelectionId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> selectionIdsList) {
+    public List<BetByMarket> getPastBetBySelectionId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> selectionIdsList) {
         LOG.debug("/getPastBetBySelectionId");
         LOG.debug(selectionIdsList.toString());
         return betByMarketService.getPastBetBySelectionId(selectionIdsList);
     }
 
     @PostMapping(path = "/getPastBetByMarketId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarketForAccountService> getPastBetByMarketId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> marketIdsList) {
+    public List<BetByMarket> getPastBetByMarketId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> marketIdsList) {
         LOG.debug("/getPastBetByMarketId");
         LOG.debug(marketIdsList.toString());
         return betByMarketService.getPastBetByMarketId(marketIdsList);
     }
 
     @PostMapping(path = "/getPastBetByEventId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarketForAccountService> getPastBetByEventId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventIdsList) {
+    public List<BetByMarket> getPastBetByEventId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventIdsList) {
         LOG.debug("/getPastBetByEventId");
         LOG.debug(eventIdsList.toString());
         return betByMarketService.getPastBetByEventId(eventIdsList);
     }
 
     @PostMapping(path = "/getPastBetByEventTypeId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarketForAccountService> getPastBetByEventTypeId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventTypeIdsList) {
+    public List<BetByMarket> getPastBetByEventTypeId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventTypeIdsList) {
         LOG.debug("/getPastBetByEventTypeId");
         LOG.debug(eventTypeIdsList.toString());
         return betByMarketService.getPastBetByEventTypeId(eventTypeIdsList);

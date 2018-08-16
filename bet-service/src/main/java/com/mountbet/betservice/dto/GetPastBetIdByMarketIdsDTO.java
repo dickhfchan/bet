@@ -4,16 +4,16 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 public class GetPastBetIdByMarketIdsDTO {
-    String selectColumns;
+    private String selectColumns;
 
-    Set<String> state;
+    private Set<String> state;
 
-    Set<String> marketIdsSet;
+    private Set<String> marketIdsSet;
 
     @NotNull
-    Long accountId;
+    private Long accountId;
 
-    TimeRange timeRange;
+    private TimeRange timeRange;
 
     public String getSelectColumns() {
         return selectColumns;
