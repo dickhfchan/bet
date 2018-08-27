@@ -5,13 +5,14 @@ import com.datastax.driver.core.querybuilder.Select;
 import com.mountbet.betservice.constant.OrderProjection;
 import com.mountbet.betservice.dto.TimeRange;
 import com.mountbet.betservice.entity.BetByMarket;
-import com.mountbet.betservice.entity.BetByMarket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.*;
@@ -20,6 +21,7 @@ import static com.mountbet.betservice.constant.OrderProjection.EXECUTABLE;
 import static com.mountbet.betservice.constant.OrderProjection.EXECUTION_COMPLETE;
 
 @Repository
+@Validated
 public class BetByMarketRepository {
     private static final Logger LOG = LoggerFactory.getLogger(BetByMarketRepository.class);
 
@@ -34,13 +36,22 @@ public class BetByMarketRepository {
         cassandraOperations.delete(betByMarket);
     }
 
-    public BetByMarket findBetByBetId(Long betId) {
+    public BetByMarket getBetById(@NotNull Long betId) {
         Select.Where select = QueryBuilder
                 .select()
                 .from("bet_by_bet_id")
                 .where(QueryBuilder.eq("bet_id", betId));
         BetByMarket betByMarket = cassandraOperations.selectOne(select, BetByMarket.class);
         return betByMarket;
+    }
+
+    public List<BetByMarket> getBetsByIds(@NotNull @NotEmpty Set<Long> betIds) {
+        Select.Where select = QueryBuilder
+                .select()
+                .from("bet_by_bet_id")
+                .where(QueryBuilder.in("bet_id", betIds));
+        List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
+        return resultList;
     }
 
 
@@ -302,4 +313,19 @@ public class BetByMarketRepository {
         }
     }
 
+    public Set<Long> getBetIdsByAccountId(@NotNull Long accountId) {
+        Select.Where selectWhere = QueryBuilder.select("bet_id")
+                .from("bet_by_aid")
+                .where(QueryBuilder.eq("account_id", accountId));
+        List<Long> betIds = cassandraOperations.select(selectWhere, Long.class);
+        return new HashSet<>(betIds);
+    }
+
+    public Set<Long> getBetIdsByAccountIds(@NotNull @NotEmpty Set<Long> accountIds) {
+        Select.Where selectWhere = QueryBuilder.select("bet_id")
+                .from("bet_by_aid")
+                .where(QueryBuilder.in("account_id", accountIds));
+        List<Long> betIds = cassandraOperations.select(selectWhere, Long.class);
+        return new HashSet<>(betIds);
+    }
 }

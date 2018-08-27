@@ -1,5 +1,6 @@
 package com.mountbet.betservice.service;
 
+import com.mountbet.betservice.client.NavigationClient;
 import com.mountbet.betservice.constant.OrderProjection;
 import com.mountbet.betservice.constant.Side;
 import com.mountbet.betservice.constant.State;
@@ -20,13 +21,14 @@ import com.mountbet.betservice.dto.UpdateOrder.UpdateInstructionReport;
 import com.mountbet.betservice.entity.BetByMarket;
 import com.mountbet.betservice.entity.key.BetByMarketKey;
 import com.mountbet.betservice.repository.BetByMarketRepository;
-import com.mountbet.betservice.client.NavigationClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -36,6 +38,7 @@ import java.util.Set;
 
 @Service
 @Transactional
+@Validated
 public class BetByMarketService {
     private static final Logger LOG = LoggerFactory.getLogger(BetByMarketService.class);
 
@@ -45,7 +48,7 @@ public class BetByMarketService {
     @Autowired
     private NavigationClient navigationClient;
 
-    public List<BetByMarket> getCurrentBetByState(@NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection){
+    public List<BetByMarket> getCurrentBetByState(@NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection) {
         return betByMarketRepository.getCurrentBetByState(
                 accountId,
                 timeRange,
@@ -53,7 +56,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<BetByMarket> getCurrentBetByMarketIdsAndState(Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection){
+    public List<BetByMarket> getCurrentBetByMarketIdsAndState(Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange, OrderProjection orderProjection) {
         return betByMarketRepository.getCurrentBetByMarketIdsAndState(
                 marketIdsSet,
                 accountId,
@@ -62,7 +65,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetId(String selectColumns, Set<String> state, @NotNull Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetId(String selectColumns, Set<String> state, @NotNull Long accountId, TimeRange timeRange) {
         return betByMarketRepository.getPastBetId(
                 selectColumns,
                 state,
@@ -71,7 +74,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByEventTypeIds(String selectColumns, Set<String> state, Set<String> eventTypeIdsSet, @NotNull Long accountId, TimeRange timeRange){
+    public List<Long> getPastBetIdByEventTypeIds(String selectColumns, Set<String> state, Set<String> eventTypeIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         return betByMarketRepository.getPastBetIdByEventTypeIds(
                 selectColumns,
                 state,
@@ -81,7 +84,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByEventIds(String selectColumns, Set<String> state, Set<String> eventIdsSet, @NotNull Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetIdByEventIds(String selectColumns, Set<String> state, Set<String> eventIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         return betByMarketRepository.getPastBetIdByEventIds(
                 selectColumns,
                 state,
@@ -91,7 +94,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByMarketIds(String selectColumns, Set<String> state, Set<String> marketIdsSet, @NotNull Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetIdByMarketIds(String selectColumns, Set<String> state, Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         return betByMarketRepository.getPastBetIdByMarketIds(
                 selectColumns,
                 state,
@@ -101,7 +104,7 @@ public class BetByMarketService {
         );
     }
 
-    public List<Long> getPastBetIdByBetIds(String selectColumns, Set<String> state, Set<String> betIdsSet, @NotNull Long accountId,  TimeRange timeRange){
+    public List<Long> getPastBetIdByBetIds(String selectColumns, Set<String> state, Set<String> betIdsSet, @NotNull Long accountId, TimeRange timeRange) {
         return betByMarketRepository.getPastBetIdByBetIds(
                 selectColumns,
                 state,
@@ -111,27 +114,27 @@ public class BetByMarketService {
         );
     }
 
-    public List<BetByMarket> getPastBetByBetId(List<Long> betIdsList){
+    public List<BetByMarket> getPastBetByBetId(List<Long> betIdsList) {
         return betByMarketRepository.getPastBetByBetId(betIdsList);
     }
 
-    public List<BetByMarket> getPastBetBySelectionId(List<Long> selectionIdsList){
+    public List<BetByMarket> getPastBetBySelectionId(List<Long> selectionIdsList) {
         return betByMarketRepository.getPastBetBySelectionId(selectionIdsList);
     }
 
-    public List<BetByMarket> getPastBetByMarketId(List<Long> marketIdsList){
+    public List<BetByMarket> getPastBetByMarketId(List<Long> marketIdsList) {
         return betByMarketRepository.getPastBetByMarketId(marketIdsList);
     }
 
-    public List<BetByMarket> getPastBetByEventId(List<Long> eventIdsList){
+    public List<BetByMarket> getPastBetByEventId(List<Long> eventIdsList) {
         return betByMarketRepository.getPastBetByEventId(eventIdsList);
     }
 
-    public List<BetByMarket> getPastBetByEventTypeId(List<Long> eventTypeIdsList){
+    public List<BetByMarket> getPastBetByEventTypeId(List<Long> eventTypeIdsList) {
         return betByMarketRepository.getPastBetByEventTypeId(eventTypeIdsList);
     }
 
-    public double getSumOfSizeMatchedByMarketId(String marketId){
+    public double getSumOfSizeMatchedByMarketId(String marketId) {
         return betByMarketRepository.getSumOfSizeMatchedByMarketId(marketId);
     }
 
@@ -172,7 +175,7 @@ public class BetByMarketService {
     public void doCancelBet(CancelInstructionReport cancelInstructionReport) {
         if (cancelInstructionReport.getStatus().equals("SUCCESS")) {
             CancelInstruction cancelInstruction = cancelInstructionReport.getInstruction();
-            BetByMarket betByMarket = betByMarketRepository.findBetByBetId(cancelInstruction.getBetId());
+            BetByMarket betByMarket = betByMarketRepository.getBetById(cancelInstruction.getBetId());
             BigDecimal newSize = betByMarket.getSize().subtract(new BigDecimal(cancelInstructionReport.getSizeCancelled()));
             betByMarket.setSize(newSize);
             betByMarketRepository.saveBet(betByMarket);
@@ -197,7 +200,7 @@ public class BetByMarketService {
         for (UpdateInstructionReport updateInstructionReport : updateInstructionReportList) {
             if (updateExecutionReport.getStatus().equals("SUCCESS")) {
                 UpdateInstruction updateInstruction = updateInstructionReport.getInstruction();
-                BetByMarket betByMarket = betByMarketRepository.findBetByBetId(updateInstruction.getBetId());
+                BetByMarket betByMarket = betByMarketRepository.getBetById(updateInstruction.getBetId());
                 betByMarket.setPersistenceType(updateInstruction.getNewPersistenceType());
                 betByMarketRepository.saveBet(betByMarket);
             } else {
@@ -219,5 +222,25 @@ public class BetByMarketService {
         key.setStatus(status);
         key.setPlacedDate(placedDate);
         return key;
+    }
+
+    public Set<Long> getBetIdsByAccountId(@NotNull Long accountId) {
+        Set<Long> betIds = betByMarketRepository.getBetIdsByAccountId(accountId);
+        return betIds;
+    }
+
+    public Set<Long> getBetIdsByAccountIds(@NotNull @NotEmpty Set<Long> accountIds) {
+        Set<Long> betIds = betByMarketRepository.getBetIdsByAccountIds(accountIds);
+        return betIds;
+    }
+
+    public BetByMarket getBetById(@NotNull Long betId) {
+        BetByMarket betByMarket = betByMarketRepository.getBetById(betId);
+        return betByMarket;
+    }
+
+    public List<BetByMarket> getBetsByIds(@NotNull @NotEmpty Set<Long> betIds) {
+        List<BetByMarket> betByMarketList = betByMarketRepository.getBetsByIds(betIds);
+        return betByMarketList;
     }
 }

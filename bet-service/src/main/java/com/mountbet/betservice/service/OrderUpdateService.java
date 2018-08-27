@@ -70,7 +70,7 @@ public class OrderUpdateService {
     }
 
     private BetByMarket updateBet(Long betId, Order order) {
-        BetByMarket betByMarket = betByMarketRepository.findBetByBetId(betId);
+        BetByMarket betByMarket = betByMarketRepository.getBetById(betId);
         if (betByMarket != null) {
             betByMarket.setPrice(new BigDecimal(order.getP()));
             betByMarket.setSize(new BigDecimal(order.getS()));
