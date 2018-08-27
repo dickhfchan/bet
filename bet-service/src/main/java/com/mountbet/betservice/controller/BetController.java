@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RequestMapping(path = "/bet")
 @RestController
@@ -148,5 +149,33 @@ public class BetController {
         LOG.debug(marketId);
         double result = betByMarketService.getSumOfSizeMatchedByMarketId(marketId);
         return result;
+    }
+
+    @GetMapping(path = "/getBetIdsByAccountId/{accountId}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public Set<Long> getBetIdsByAccountId(@PathVariable(value = "accountId") Long accountId) {
+        LOG.debug("getBetIdsByAccountId:" + accountId);
+        Set<Long> betIds = betByMarketService.getBetIdsByAccountId(accountId);
+        return betIds;
+    }
+
+    @GetMapping(path = "/getBetIdsByAccountIds/{accountIds}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public Set<Long> getBetIdsByAccountIds(@PathVariable(value = "accountIds") Set<Long> accountIds) {
+        LOG.debug("getBetIdsByAccountIds:" + accountIds);
+        Set<Long> betIds = betByMarketService.getBetIdsByAccountIds(accountIds);
+        return betIds;
+    }
+
+    @GetMapping(path = "/getBetById/{betId}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public BetByMarket getBetById(@PathVariable(value = "betId") Long betId) {
+        LOG.debug("getBetById:" + betId);
+        BetByMarket betByMarket = betByMarketService.getBetById(betId);
+        return betByMarket;
+    }
+
+    @GetMapping(path = "/getBetsByIds/{betIds}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public List<BetByMarket> getBetById(@PathVariable(value = "betIds") Set<Long> betIds) {
+        LOG.debug("getBetsByIds:" + betIds);
+        List<BetByMarket> betByMarketList = betByMarketService.getBetsByIds(betIds);
+        return betByMarketList;
     }
 }
