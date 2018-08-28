@@ -108,39 +108,39 @@ public class BetController {
         );
     }
 
-    @PostMapping(path = "/getPastBetByBetId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarket> getPastBetByBetId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> betIdsList) {
-        LOG.debug("/getPastBetIdByBetIds");
+    @PostMapping(path = "/getBetByBetId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public List<BetByMarket> getBetByBetId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> betIdsList) {
+        LOG.debug("/getBetIdByBetIds");
         LOG.debug(betIdsList.toString());
-        return betByMarketService.getPastBetByBetId(betIdsList);
+        return betByMarketService.getBetByBetId(betIdsList);
     }
 
-    @PostMapping(path = "/getPastBetBySelectionId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarket> getPastBetBySelectionId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> selectionIdsList) {
-        LOG.debug("/getPastBetBySelectionId");
+    @PostMapping(path = "/getBetBySelectionId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public List<BetByMarket> getBetBySelectionId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> selectionIdsList) {
+        LOG.debug("/getBetBySelectionId");
         LOG.debug(selectionIdsList.toString());
-        return betByMarketService.getPastBetBySelectionId(selectionIdsList);
+        return betByMarketService.getBetBySelectionId(selectionIdsList);
     }
 
-    @PostMapping(path = "/getPastBetByMarketId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarket> getPastBetByMarketId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> marketIdsList) {
-        LOG.debug("/getPastBetByMarketId");
+    @PostMapping(path = "/getBetByMarketId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public List<BetByMarket> getBetByMarketId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> marketIdsList) {
+        LOG.debug("/getBetByMarketId");
         LOG.debug(marketIdsList.toString());
-        return betByMarketService.getPastBetByMarketId(marketIdsList);
+        return betByMarketService.getBetByMarketId(marketIdsList);
     }
 
-    @PostMapping(path = "/getPastBetByEventId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarket> getPastBetByEventId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventIdsList) {
-        LOG.debug("/getPastBetByEventId");
+    @PostMapping(path = "/getBetByEventId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public List<BetByMarket> getBetByEventId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventIdsList) {
+        LOG.debug("/getBetByEventId");
         LOG.debug(eventIdsList.toString());
-        return betByMarketService.getPastBetByEventId(eventIdsList);
+        return betByMarketService.getBetByEventId(eventIdsList);
     }
 
-    @PostMapping(path = "/getPastBetByEventTypeId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-    public List<BetByMarket> getPastBetByEventTypeId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventTypeIdsList) {
-        LOG.debug("/getPastBetByEventTypeId");
+    @PostMapping(path = "/getBetByEventTypeId", consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE}, produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public List<BetByMarket> getBetByEventTypeId(@RequestHeader HttpHeaders httpHeaders, @RequestBody List<Long> eventTypeIdsList) {
+        LOG.debug("/getBetByEventTypeId");
         LOG.debug(eventTypeIdsList.toString());
-        return betByMarketService.getPastBetByEventTypeId(eventTypeIdsList);
+        return betByMarketService.getBetByEventTypeId(eventTypeIdsList);
     }
 
     @GetMapping(path = "/getSumOfSizeMatchedByMarketId/{marketId}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
