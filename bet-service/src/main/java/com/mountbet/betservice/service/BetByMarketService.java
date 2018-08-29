@@ -114,24 +114,24 @@ public class BetByMarketService {
         );
     }
 
-    public List<BetByMarket> getPastBetByBetId(List<Long> betIdsList) {
-        return betByMarketRepository.getPastBetByBetId(betIdsList);
+    public List<BetByMarket> getBetByBetId(List<Long> betIdsList) {
+        return betByMarketRepository.getBetByBetId(betIdsList);
     }
 
-    public List<BetByMarket> getPastBetBySelectionId(List<Long> selectionIdsList) {
-        return betByMarketRepository.getPastBetBySelectionId(selectionIdsList);
+    public List<BetByMarket> getBetBySelectionId(List<Long> selectionIdsList) {
+        return betByMarketRepository.getBetBySelectionId(selectionIdsList);
     }
 
-    public List<BetByMarket> getPastBetByMarketId(List<Long> marketIdsList) {
-        return betByMarketRepository.getPastBetByMarketId(marketIdsList);
+    public List<BetByMarket> getBetByMarketId(List<Long> marketIdsList) {
+        return betByMarketRepository.getBetByMarketId(marketIdsList);
     }
 
-    public List<BetByMarket> getPastBetByEventId(List<Long> eventIdsList) {
-        return betByMarketRepository.getPastBetByEventId(eventIdsList);
+    public List<BetByMarket> getBetByEventId(List<Long> eventIdsList) {
+        return betByMarketRepository.getBetByEventId(eventIdsList);
     }
 
-    public List<BetByMarket> getPastBetByEventTypeId(List<Long> eventTypeIdsList) {
-        return betByMarketRepository.getPastBetByEventTypeId(eventTypeIdsList);
+    public List<BetByMarket> getBetByEventTypeId(List<Long> eventTypeIdsList) {
+        return betByMarketRepository.getBetByEventTypeId(eventTypeIdsList);
     }
 
     public double getSumOfSizeMatchedByMarketId(String marketId) {

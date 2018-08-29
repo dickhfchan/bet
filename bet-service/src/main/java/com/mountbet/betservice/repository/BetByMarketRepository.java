@@ -82,8 +82,8 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetId(String selectColumns, Set<String> state, @NotNull Long accountId, TimeRange timeRange) {
-        Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state")
+    public List<Long> getPastBetId(String selectColumn, Set<String> state, @NotNull Long accountId, TimeRange timeRange) {
+        Select.Where selectWhere = QueryBuilder.select(selectColumn).from("bet_by_state")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.eq("account_id", accountId))
                 .and(QueryBuilder.eq("status", "PAST"));
@@ -93,8 +93,8 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByEventTypeIds(String selectColumns, Set<String> state, Set<String> eventTypeIdsSet, @NotNull Long accountId, TimeRange timeRange) {
-        Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_etid")
+    public List<Long> getPastBetIdByEventTypeIds(String selectColumn, Set<String> state, Set<String> eventTypeIdsSet, @NotNull Long accountId, TimeRange timeRange) {
+        Select.Where selectWhere = QueryBuilder.select(selectColumn).from("bet_by_state_etid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("event_type_id", eventTypeIdsSet))
                 .and(QueryBuilder.eq("account_id", accountId))
@@ -105,8 +105,8 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByEventIds(String selectColumns, Set<String> state, Set<String> eventIdsSet, @NotNull Long accountId, TimeRange timeRange) {
-        Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_eid")
+    public List<Long> getPastBetIdByEventIds(String selectColumn, Set<String> state, Set<String> eventIdsSet, @NotNull Long accountId, TimeRange timeRange) {
+        Select.Where selectWhere = QueryBuilder.select(selectColumn).from("bet_by_state_eid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("event_id", eventIdsSet))
                 .and(QueryBuilder.eq("account_id", accountId))
@@ -117,8 +117,8 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByMarketIds(String selectColumns, Set<String> state, Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange) {
-        Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_mid")
+    public List<Long> getPastBetIdByMarketIds(String selectColumn, Set<String> state, Set<String> marketIdsSet, @NotNull Long accountId, TimeRange timeRange) {
+        Select.Where selectWhere = QueryBuilder.select(selectColumn).from("bet_by_state_mid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("market_id", marketIdsSet))
                 .and(QueryBuilder.eq("account_id", accountId))
@@ -129,8 +129,8 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<Long> getPastBetIdByBetIds(String selectColumns, Set<String> state, Set<String> betIdsSet, @NotNull Long accountId, TimeRange timeRange) {
-        Select.Where selectWhere = QueryBuilder.select(selectColumns).from("bet_by_state_bid")
+    public List<Long> getPastBetIdByBetIds(String selectColumn, Set<String> state, Set<String> betIdsSet, @NotNull Long accountId, TimeRange timeRange) {
+        Select.Where selectWhere = QueryBuilder.select(selectColumn).from("bet_by_state_bid")
                 .where(QueryBuilder.in("state", state))
                 .and(QueryBuilder.in("bet_id", betIdsSet))
                 .and(QueryBuilder.eq("account_id", accountId))
@@ -141,7 +141,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<BetByMarket> getPastBetByBetId(List<Long> betIdsList) {
+    public List<BetByMarket> getBetByBetId(List<Long> betIdsList) {
         Set<Long> betIdsSet = new HashSet<Long>(betIdsList);
         Select select = QueryBuilder.select().from("bet_by_bet_id")
                 .where(QueryBuilder.in("bet_id", betIdsSet))
@@ -150,7 +150,7 @@ public class BetByMarketRepository {
         return resultList;
     }
 
-    public List<BetByMarket> getPastBetBySelectionId(List<Long> selectionIdsList) {
+    public List<BetByMarket> getBetBySelectionId(List<Long> selectionIdsList) {
         Set<Long> selectionIdsSet = new HashSet<Long>(selectionIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id",
@@ -162,7 +162,7 @@ public class BetByMarketRepository {
         ).from("bet_by_sid")
                 .where(QueryBuilder.in("selection_id", selectionIdsSet))
                 .groupBy("selection_id");
-        LOG.debug("getPastBetBySelectionId select:" + select.toString());
+        LOG.debug("getBetBySelectionId select:" + select.toString());
         List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
         List<BetByMarket> finalList = new ArrayList<>();
         for (BetByMarket betByMarket : resultList) {
@@ -189,7 +189,7 @@ public class BetByMarketRepository {
         return finalList;
     }
 
-    public List<BetByMarket> getPastBetByMarketId(List<Long> marketIdsList) {
+    public List<BetByMarket> getBetByMarketId(List<Long> marketIdsList) {
         Set<Long> marketIdsSet = new HashSet<Long>(marketIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id",
@@ -198,7 +198,7 @@ public class BetByMarketRepository {
         ).from("bet_by_mid_aid")
                 .where(QueryBuilder.in("market_id", marketIdsSet))
                 .groupBy("market_id");
-        LOG.debug("getPastBetByMarketId select:" + select.toString());
+        LOG.debug("getBetByMarketId select:" + select.toString());
         List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
         List<BetByMarket> finalList = new ArrayList<>();
         for (BetByMarket betByMarket : resultList) {
@@ -221,7 +221,7 @@ public class BetByMarketRepository {
         return finalList;
     }
 
-    public List<BetByMarket> getPastBetByEventId(List<Long> eventIdsList) {
+    public List<BetByMarket> getBetByEventId(List<Long> eventIdsList) {
         Set<Long> eventIdsSet = new HashSet<Long>(eventIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id",
@@ -229,7 +229,7 @@ public class BetByMarketRepository {
         ).from("bet_by_eid")
                 .where(QueryBuilder.in("event_id", eventIdsSet))
                 .groupBy("event_id");
-        LOG.debug("getPastBetByEventId select:" + select.toString());
+        LOG.debug("getBetByEventId select:" + select.toString());
         List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
         List<BetByMarket> finalList = new ArrayList<>();
         for (BetByMarket betByMarket : resultList) {
@@ -249,14 +249,14 @@ public class BetByMarketRepository {
     }
 
 
-    public List<BetByMarket> getPastBetByEventTypeId(List<Long> eventTypeIdsList) {
+    public List<BetByMarket> getBetByEventTypeId(List<Long> eventTypeIdsList) {
         Set<Long> eventTypeIdsSet = new HashSet<Long>(eventTypeIdsList);
         Select select = QueryBuilder.select(
                 "event_type_id"
         ).from("bet_by_etid")
                 .where(QueryBuilder.in("event_type_id", eventTypeIdsSet))
                 .groupBy("event_type_id");
-        LOG.debug("getPastBetByEventTypeId select:" + select.toString());
+        LOG.debug("getBetByEventTypeId select:" + select.toString());
         List<BetByMarket> resultList = cassandraOperations.select(select, BetByMarket.class);
         List<BetByMarket> finalList = new ArrayList<>();
         for (BetByMarket betByMarket : resultList) {
